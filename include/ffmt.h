@@ -1,6 +1,7 @@
 #ifndef FFMT_H__
 #define FFMT_H__
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -23,6 +24,7 @@
     FFMT__STR(FFMT_VER_PATCH) \
   )
 
-extern void ffmt_stub();
+extern int ffmt_u64_to_dec(uint64_t value, char* buffer, size_t buffer_size);
+extern int ffmt_u64_to_hex(uint64_t value, char* buffer, size_t buffer_size, bool upper);
 
 #endif /* FFMT_H__ */

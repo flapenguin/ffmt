@@ -5,8 +5,13 @@ project(ffmt)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-add_library(ffmt src/ffmt.c)
+add_library(ffmt STATIC
+    src/u64_to_dec.c
+    src/u64_to_hex.c)
+target_compile_options(ffmt PRIVATE
+    -Wall -Wextra -nostdlib -Wmissing-prototypes -Wmissing-declarations -Werror)
 
-add_executable(smoke test/smoke.c)
-target_link_libraries(smoke ffmt)
-add_test(NAME "smoke" COMMAND smoke)
+add_executable(dechex test/dechex.c)
+set (CMAKE_C_FLAGS "-std=c99 ${CMAKE_C_FLAGS}")
+target_link_libraries(dechex ffmt)
+add_test(NAME dechex COMMAND dechex)
