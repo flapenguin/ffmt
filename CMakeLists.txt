@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 enable_testing()
 
 project(ffmt)
@@ -7,11 +7,25 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_library(ffmt STATIC
     src/u64_to_dec.c
-    src/u64_to_hex.c)
+    src/u64_to_hex.c
+    src/ffmt.c)
 target_compile_options(ffmt PRIVATE
     -Wall -Wextra -nostdlib -Wmissing-prototypes -Wmissing-declarations -Werror)
 
-add_executable(dechex test/dechex.c)
-set (CMAKE_C_FLAGS "-std=c99 ${CMAKE_C_FLAGS}")
-target_link_libraries(dechex ffmt)
-add_test(NAME dechex COMMAND dechex)
+function(create_test name src)
+    add_executable(${name} ${src})
+    target_link_libraries(${name} ffmt)
+
+    set_target_properties(${name} PROPERTIES BUILD_TYPE Debug)
+
+    if("${src}" MATCHES "\\.c$")
+        set_target_properties(${name} PROPERTIES C_STANDARD 11)
+    else()
+        set_target_properties(${name} PROPERTIES CXX_STANDARD 14)
+    endif()
+
+    add_test(NAME ${name} COMMAND ${name})
+endfunction(create_test)
+
+create_test(dechex test/dechex.c)
+create_test(format test/format.cxx)

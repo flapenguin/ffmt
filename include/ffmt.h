@@ -24,6 +24,31 @@
     FFMT__STR(FFMT_VER_PATCH) \
   )
 
+#define FFMT_AUTO ((size_t)-1)
+#define FFMT_EFLUSH ((size_t)-1)
+
+typedef struct ffmt_out_t ffmt_out_t;
+typedef struct ffmt_t ffmt_t;
+
+struct ffmt_out_t {
+  uint8_t* buffer;
+  size_t buffer_size;
+  size_t pos;
+
+  void (*flush)(ffmt_out_t* self);
+};
+
+static inline void ffmt_out_flush(ffmt_out_t* out) {
+  out->flush(out);
+}
+
+struct ffmt_t {};
+
+extern size_t ffmt_putc(
+  const ffmt_t* self,
+  ffmt_out_t* out,
+  char c);
+
 extern int ffmt_u64_to_dec(uint64_t value, char* buffer, size_t buffer_size);
 extern int ffmt_u64_to_hex(uint64_t value, char* buffer, size_t buffer_size, bool upper);
 
