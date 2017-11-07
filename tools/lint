@@ -1,0 +1,23 @@
+#!/bin/sh
+
+err=0
+
+. "`dirname $0`/config.sh"
+
+tmp="`mktemp`"
+
+for file in src/*; do
+  echo ""
+  echo "====================================="
+  echo "==== $file ..."
+  echo "====================================="
+
+  "$CLANG_FORMAT" -style=file "$file" >"$tmp"
+  git --no-pager diff -- "$file" "$tmp"
+  if [ $? -ne 0 ]; then
+    err=1
+  fi
+done
+
+rm "$tmp"
+exit $err
