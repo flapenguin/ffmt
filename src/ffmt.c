@@ -1,10 +1,6 @@
 #include "ffmt.internal.h"
 
-size_t ffmt_putc(
-  const ffmt_t* self,
-  ffmt_out_t* out,
-  char c
-) {
+size_t ffmt_putc(const ffmt_t* self, ffmt_out_t* out, char c) {
   (void)self;
 
   if (out->pos >= out->buffer_size) {

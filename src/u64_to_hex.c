@@ -11,10 +11,13 @@ uint ffmt__u64_digits_hex(uint64_t value) {
   return 16;
 }
 
-void ffmt__u64_to_hex_impl(uint64_t value, char* const buffer, size_t digits, bool upper) {
-  const char* const hex_lookup = upper
-    ? "0123456789ABCDEF"
-    : "0123456789abcdef";
+void ffmt__u64_to_hex_impl(
+    uint64_t value,
+    char* const buffer,
+    size_t digits,
+    bool upper) {
+  const char* const hex_lookup =
+      upper ? "0123456789ABCDEF" : "0123456789abcdef";
 
   uint pos = digits - 1;
   do {
@@ -24,7 +27,11 @@ void ffmt__u64_to_hex_impl(uint64_t value, char* const buffer, size_t digits, bo
   } while (value);
 }
 
-int ffmt_u64_to_hex(uint64_t value, char* const buffer, size_t buffer_size, bool upper) {
+int ffmt_u64_to_hex(
+    uint64_t value,
+    char* const buffer,
+    size_t buffer_size,
+    bool upper) {
   const uint digits = ffmt__u64_digits_hex(value);
   if (digits >= buffer_size) {
     return -1;

@@ -7,12 +7,18 @@ err=0
 tmp="`mktemp`"
 
 for file in src/*; do
+  clang-format -style=file "$file" >"$tmp"
+  chmod --reference="$file" "$tmp"
+
+  git --no-pager diff --quiet -- "$file" "$tmp"
+  if [ $? -eq 0 ]; then
+    continue
+  fi
+
   echo ""
   echo "====================================="
   echo "==== $file ..."
   echo "====================================="
-
-  "$CLANG_FORMAT" -style=file "$file" >"$tmp"
   git --no-pager diff -- "$file" "$tmp"
   if [ $? -ne 0 ]; then
     err=1
@@ -20,4 +26,5 @@ for file in src/*; do
 done
 
 rm "$tmp"
+[ $err -ne 0 ] && echo "linter failed" >&2
 exit $err

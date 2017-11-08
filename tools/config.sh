@@ -1,7 +1,8 @@
-local_config="`dirname $0`/config.local.sh"
+local_config="`dirname $BASH_SOURCE`/config.local.sh"
 
-if [ -e "$local_config" ]; then
+[ -e "$local_config" ] && {
+  echo "Local config: $local_config"
   . "$local_config"
-fi
+}
 
 [ -z "$CLANG_FORMAT" ] && CLANG_FORMAT="clang-format"
