@@ -28,7 +28,6 @@
 #define FFMT_EFLUSH ((size_t)-1)
 
 typedef struct ffmt_out_t ffmt_out_t;
-typedef struct ffmt_t ffmt_t;
 
 struct ffmt_out_t {
   uint8_t* buffer;
@@ -38,16 +37,14 @@ struct ffmt_out_t {
   void (*flush)(ffmt_out_t* self);
 };
 
-static inline void ffmt_out_flush(ffmt_out_t* out) {
+// API
+static inline void ffmt_flush(ffmt_out_t* out) {
   out->flush(out);
 }
 
-struct ffmt_t {};
-
-extern size_t ffmt_putc(
-  const ffmt_t* self,
-  ffmt_out_t* out,
-  char c);
+// API + ABI
+extern size_t ffmt_putc(ffmt_out_t* out, char c);
+extern size_t ffmt_puts(ffmt_out_t* out, const char* str, size_t length);
 
 extern int ffmt_u64_to_dec(uint64_t value, char* buffer, size_t buffer_size);
 extern int ffmt_u64_to_hex(uint64_t value, char* buffer, size_t buffer_size, bool upper);
