@@ -1,10 +1,9 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 err=0
-
-. "`dirname $0`/config.sh"
-
 tmp="`mktemp`"
+
+. "$(dirname $0)/config.sh"
 
 for file in src/*; do
   clang-format -style=file "$file" >"$tmp"

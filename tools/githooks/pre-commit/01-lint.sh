@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-sh tools/lint
+bash tools/lint
 exit $?

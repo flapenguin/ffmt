@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 root="$(pwd)"
 . "$root/tools/config.sh"
