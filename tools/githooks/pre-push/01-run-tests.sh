@@ -6,7 +6,7 @@ root="$(pwd)"
 err=0
 
 run() {
-  local dir="$root/build/hook-$1"
+  local dir="$root/.hook-build/$1"
   rm -rf "$dir"
   mkdir -p "$dir"
 
@@ -17,8 +17,6 @@ run() {
   cmake -D CMAKE_BUILD_TYPE=$1 ../../ || err=1
   cmake --build . || err=1
   ctest || err=1
-
-  rm -rf "$dir"
 }
 
 run debug
