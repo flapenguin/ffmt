@@ -25,9 +25,24 @@
   )
 
 #define FFMT_AUTO ((size_t)-1)
+
 #define FFMT_EFLUSH ((size_t)-1)
+#define FFMT_EFORMAT ((size_t)-2)
+#define FFMT_EARGLEN ((size_t)-3)
+#define FFMT_ENOFORMATTER ((size_t)-4)
+
+#define FFMT_FORMATTER_DECL(Name) \
+  size_t Name( \
+    ffmt_out_t* out, \
+    const ffmt_arg_t arg, \
+    const ffmt_arg_t* args, \
+    size_t args_length, \
+    const char* spec, \
+    const char* spec_end)
 
 typedef struct ffmt_out_t ffmt_out_t;
+typedef struct ffmt_arg_t ffmt_arg_t;
+typedef FFMT_FORMATTER_DECL((*ffmt_formatter_t));
 
 struct ffmt_out_t {
   uint8_t* buffer;
@@ -37,9 +52,19 @@ struct ffmt_out_t {
   void (*flush)(ffmt_out_t* self);
 };
 
+struct ffmt_arg_t {
+  const ffmt_formatter_t formatter;
+  const void* value;
+};
+
+
 // API
 static inline void ffmt_flush(ffmt_out_t* out) {
   out->flush(out);
+}
+
+static inline bool ffmt_is_err(size_t value) {
+  return value >= (size_t)-4096;
 }
 
 // API + ABI
@@ -48,5 +73,13 @@ extern size_t ffmt_puts(ffmt_out_t* out, const char* str, size_t length);
 
 extern int ffmt_u64_to_dec(uint64_t value, char* buffer, size_t buffer_size);
 extern int ffmt_u64_to_hex(uint64_t value, char* buffer, size_t buffer_size, bool upper);
+
+extern size_t ffmt_write(
+  ffmt_out_t* out,
+  const char* format,
+  const ffmt_arg_t* args,
+  size_t args_length);
+
+extern FFMT_FORMATTER_DECL(ffmt_formatter_str);
 
 #endif /* FFMT_H__ */
