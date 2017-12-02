@@ -5,7 +5,7 @@ tmp="`mktemp`"
 
 . "$(dirname $0)/config.sh"
 
-for file in src/*; do
+for file in src/* include/*; do
   clang_format -style=file "$file" >"$tmp"
   chmod --reference="$file" "$tmp"
 
