@@ -107,17 +107,19 @@ static void test_format() {
   {
     const char result[] = "12302652060662169617,123456789123456789,-123456789123456789,"
       "aabbccddeeff0011,0xaabbccddeeff0011,AABBCCDDEEFF0011,0xAABBCCDDEEFF0011,"
-      "foobar,true,false";
+      "foobar,true,false,x,y";
 
     asserteq(str_size(result),
         out.write(
-          "{0},{1},{2},{0:x},{0:#x},{0:X},{0:#X},{3},{4},{5}",
+          "{0},{1},{2},{0:x},{0:#x},{0:X},{0:#X},{3},{4},{5},{6},{7}",
           0xaabbccddeeff0011,
           123456789123456789UL,
           -123456789123456789L,
           "foobar",
           true,
-          false));
+          false,
+          'x',
+          'y'));
 
     out.flush();
     asserteq(result, out);

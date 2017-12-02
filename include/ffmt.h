@@ -92,6 +92,7 @@ extern size_t ffmt_write(
     size_t args_length);
 
 extern FFMT_FORMATTER_DECL(ffmt_formatter_str);
+extern FFMT_FORMATTER_DECL(ffmt_formatter_char);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_i64);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_u64);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_bool);

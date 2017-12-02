@@ -23,20 +23,21 @@ namespace ffmt {
   }
 
   namespace arg_packers {
-    auto pack(const char* value) {
-      return (::ffmt_arg_t){::ffmt_formatter_str, (const void*)value};
-    }
+    // clang-format off
+    auto get_formatter(const char*) { return ::ffmt_formatter_str; }
+    auto get_formatter(char) { return ::ffmt_formatter_char; }
+    auto get_formatter(bool) { return ::ffmt_formatter_bool; }
+    auto get_formatter(int64_t) { return ::ffmt_formatter_i64; }
+    auto get_formatter(uint64_t) { return ::ffmt_formatter_u64; }
+    // clang-format on
 
-    auto pack(uint64_t value) {
-      return (::ffmt_arg_t){::ffmt_formatter_u64, (const void*)value};
-    }
+    template <typename T>
+    auto pack(T value) {
+      static_assert(
+          sizeof(T) <= sizeof(intptr_t) && alignof(T) <= alignof(intptr_t),
+          "Bad size/alignment of value");
 
-    auto pack(int64_t value) {
-      return (::ffmt_arg_t){::ffmt_formatter_i64, (const void*)value};
-    }
-
-    auto pack(bool value) {
-      return (::ffmt_arg_t){::ffmt_formatter_bool, (const void*)value};
+      return (::ffmt_arg_t){get_formatter(value), (const void*)(intptr_t)value};
     }
   } // namespace arg_packers
 
