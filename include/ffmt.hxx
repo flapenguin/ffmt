@@ -34,6 +34,10 @@ namespace ffmt {
     auto pack(int64_t value) {
       return (::ffmt_arg_t){::ffmt_formatter_i64, (const void*)value};
     }
+
+    auto pack(bool value) {
+      return (::ffmt_arg_t){::ffmt_formatter_bool, (const void*)value};
+    }
   } // namespace arg_packers
 
   template <typename... Args>

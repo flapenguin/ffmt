@@ -13,7 +13,7 @@ template <size_t Size>
 static inline size_t str_size(const char (&x)[Size]) { return Size - 1; }
 
 template <size_t BufferSize>
-struct ss_output : public ffmt::out {
+struct ss_output final : public ffmt::out {
 private:
   std::stringstream _ss;
   char _buffer[BufferSize];
@@ -106,11 +106,18 @@ static void test_format() {
 
   {
     const char result[] = "12302652060662169617,123456789123456789,-123456789123456789,"
-      "aabbccddeeff0011,0xaabbccddeeff0011,AABBCCDDEEFF0011,0xAABBCCDDEEFF0011";
+      "aabbccddeeff0011,0xaabbccddeeff0011,AABBCCDDEEFF0011,0xAABBCCDDEEFF0011,"
+      "foobar,true,false";
 
     asserteq(str_size(result),
-        out.write("{0},{1},{2},{0:x},{0:#x},{0:X},{0:#X}",
-          0xaabbccddeeff0011, 123456789123456789UL, -123456789123456789L));
+        out.write(
+          "{0},{1},{2},{0:x},{0:#x},{0:X},{0:#X},{3},{4},{5}",
+          0xaabbccddeeff0011,
+          123456789123456789UL,
+          -123456789123456789L,
+          "foobar",
+          true,
+          false));
 
     out.flush();
     asserteq(result, out);

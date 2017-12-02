@@ -15,6 +15,21 @@ size_t ffmt_formatter_str(
   return ffmt_puts(out, (const char*)arg.value, FFMT_AUTO);
 }
 
+size_t ffmt_formatter_bool(
+    ffmt_out_t* out,
+    const ffmt_arg_t arg,
+    const ffmt_arg_t* args,
+    size_t args_length,
+    const char* spec,
+    const char* spec_end) {
+  (void)args;
+  (void)args_length;
+  (void)spec;
+  (void)spec_end;
+
+  return arg.value ? ffmt_puts(out, "true", 4) : ffmt_puts(out, "false", 5);
+}
+
 size_t ffmt_formatter_i64(
     ffmt_out_t* out,
     const ffmt_arg_t arg,
