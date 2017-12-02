@@ -77,7 +77,10 @@ size_t ffmt_write(
       i++;
     }
 
-    ffmt_puts(out, &format[plain_start], i - plain_start);
+    if (i > plain_start) {
+      FFMT__COUNT_OR_RETURN(
+          total, ffmt_puts(out, &format[plain_start], i - plain_start));
+    }
 
     const char* spec_start = 0;
     const char* spec_end = 0;
@@ -143,11 +146,8 @@ size_t ffmt_write(
       return FFMT_ENOFORMATTER;
     }
 
-    size_t r = formatter(out, arg, args, args_length, spec_start, spec_end);
-    if (ffmt_is_err(r)) {
-      return r;
-    }
-    total += r;
+    FFMT__COUNT_OR_RETURN(
+        total, formatter(out, arg, args, args_length, spec_start, spec_end));
 
     if (!position_args) {
       arg_ix++;
@@ -157,7 +157,8 @@ size_t ffmt_write(
     plain_start = i;
   }
 
-  ffmt_puts(out, &format[plain_start], i - plain_start);
+  FFMT__COUNT_OR_RETURN(
+      total, ffmt_puts(out, &format[plain_start], i - plain_start));
 
   return total;
 }

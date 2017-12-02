@@ -3,6 +3,16 @@
 
 #include "ffmt.h"
 
+#define FFMT__COUNT_OR_RETURN(Counter, Expression)                             \
+  do {                                                                         \
+    const size_t __written = Expression;                                       \
+    if (ffmt_is_err(__written)) {                                              \
+      return __written;                                                        \
+    } else {                                                                   \
+      Counter += __written;                                                    \
+    }                                                                          \
+  } while (0)
+
 typedef unsigned int uint;
 
 uint ffmt__u64_digits_dec(uint64_t value);
