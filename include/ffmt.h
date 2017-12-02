@@ -12,6 +12,14 @@
 #define FFMT_VER_MINOR 1
 #define FFMT_VER_PATCH 0
 
+#define FFMT_AUTO ((size_t)-1)
+
+#define FFMT_EFLUSH ((size_t)-1)
+#define FFMT_EFORMAT ((size_t)-2)
+#define FFMT_EARGLEN ((size_t)-3)
+#define FFMT_ENOFORMATTER ((size_t)-4)
+#define FFMT_ESMALLBUF ((size_t)-5)
+
 /* clang-format off */
 
 #define FFMT_VER ( \
@@ -35,17 +43,6 @@
     const char* spec, \
     const char* spec_end)
 
-/* clang-format on */
-
-#define FFMT_AUTO ((size_t)-1)
-
-#define FFMT_EFLUSH ((size_t)-1)
-#define FFMT_EFORMAT ((size_t)-2)
-#define FFMT_EARGLEN ((size_t)-3)
-#define FFMT_ENOFORMATTER ((size_t)-4)
-#define FFMT_ESMALLBUF ((size_t)-5)
-
-/* clang-format off */
 #define FFMT_FOREACH_ERROR(Fn)                                                 \
     Fn(FFMT_EFLUSH, "Cannot flush.")                                           \
     Fn(FFMT_EFORMAT, "Bad format.")                                            \
@@ -85,7 +82,6 @@ extern size_t ffmt_putc(ffmt_out_t* out, char c);
 extern size_t ffmt_puts(ffmt_out_t* out, const char* str, size_t length);
 
 extern int ffmt_u64_to_dec(uint64_t value, char* buffer, size_t buffer_size);
-
 extern int
 ffmt_u64_to_hex(uint64_t value, char* buffer, size_t buffer_size, bool upper);
 
@@ -98,5 +94,6 @@ extern size_t ffmt_write(
 extern FFMT_FORMATTER_DECL(ffmt_formatter_str);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_i64);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_u64);
+extern FFMT_FORMATTER_DECL(ffmt_formatter_bool);
 
 #endif /* FFMT_H__ */
