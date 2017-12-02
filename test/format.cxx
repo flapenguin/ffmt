@@ -143,6 +143,29 @@ static void test_format() {
   }
 }
 
+static void test_pad() {
+  ss_output<64> out;
+
+  const char result[] = ""
+    "\n123456,foobar"
+    "\n123,foo"
+    "\n456,bar"
+    "\n";
+
+  asserteq(str_size(result),
+      out.write(
+        "\n{0},{1}"
+        "\n{0:<3},{1:<3}"
+        "\n{0:>3},{1:>3}"
+        "\n",
+        123456,
+        "foobar"));
+
+  out.flush();
+  asserteq(result, out);
+  out.clear();
+}
+
 static void test_throw() {
   try {
     ss_output<18> out;
@@ -162,6 +185,7 @@ int main() {
   test_flush();
   test_format();
   test_throw();
+  test_pad();
 
   return failed ? 1 : 0;
 }

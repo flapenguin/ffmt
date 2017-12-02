@@ -54,6 +54,7 @@
 /* Forward declarations */
 typedef struct ffmt_out_t ffmt_out_t;
 typedef struct ffmt_arg_t ffmt_arg_t;
+typedef struct ffmt_pad_t ffmt_pad_t;
 typedef FFMT_FORMATTER_DECL((*ffmt_formatter_t));
 
 /* Actual declaration of ffmt structs */
@@ -70,6 +71,17 @@ struct ffmt_arg_t {
   const void* value;
 };
 
+struct ffmt_pad_t {
+  char align;
+  size_t width;
+  const char* str;
+  size_t str_length;
+};
+
+/* clang-format off */
+#define FFMT_PAD_DEFAULT (ffmt_pad_t){ '\0', 0, " ", 1 }
+/* clang-format on */
+
 /* API */
 static inline bool ffmt_is_err(size_t value) {
   return value >= (size_t)-4096;
@@ -80,6 +92,8 @@ extern void ffmt_flush(ffmt_out_t* out);
 
 extern size_t ffmt_putc(ffmt_out_t* out, char c);
 extern size_t ffmt_puts(ffmt_out_t* out, const char* str, size_t length);
+extern size_t
+ffmt_puts_pad(ffmt_out_t* out, const char* str, size_t length, ffmt_pad_t pad);
 
 extern int ffmt_u64_to_dec(uint64_t value, char* buffer, size_t buffer_size);
 extern int

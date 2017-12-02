@@ -1,21 +1,5 @@
 #include "ffmt.internal.h"
 
-static inline bool ffmt__is_digit(char c) {
-  return '0' <= c && c <= '9';
-}
-
-static inline const char* ffmt__strchr(const char* str, const char* breaks) {
-  for (; *str; str++) {
-    for (const char* b = breaks; *b; b++) {
-      if (*str == *b) {
-        return str;
-      }
-    }
-  }
-
-  return 0;
-}
-
 void ffmt_flush(ffmt_out_t* out) {
   out->flush(out);
 }
@@ -34,31 +18,31 @@ size_t ffmt_putc(ffmt_out_t* out, char c) {
 }
 
 size_t ffmt_puts(ffmt_out_t* out, const char* str, size_t length) {
-  if (length == FFMT_AUTO) {
-    const char* x = str;
-    while (*x) {
-      x++;
-    }
+  length = ffmt__fix_length(str, length);
 
-    length = x - str;
+  return ffmt__puts_base(out, str, length);
+}
+
+extern size_t
+ffmt_puts_pad(ffmt_out_t* out, const char* str, size_t length, ffmt_pad_t pad) {
+  if (!pad.align || !pad.width) {
+    return ffmt_puts(out, str, length);
   }
 
-  const char* start = str;
-  while (length) {
-    size_t till_flush = out->buffer_size - out->pos;
-    while (till_flush && length) {
-      out->buffer[out->pos++] = *str++;
+  length = ffmt__fix_length(str, length);
 
-      length--;
-      till_flush--;
-    }
-
-    if (!till_flush) {
-      ffmt_flush(out);
+  if (pad.align && pad.width < length) {
+    if (pad.align == '<') {
+      length = pad.width;
+    } else if (pad.align == '>') {
+      str += (length - pad.width);
+      length -= pad.width;
     }
   }
 
-  return str - start;
+  FFMT__BUBBLE_ERROR(ffmt__puts_base(out, str, length));
+
+  return length;
 }
 
 size_t ffmt_write(
@@ -72,18 +56,18 @@ size_t ffmt_write(
   size_t plain_start = 0;
   size_t i = 0;
 
-  while (format[i]) {
+  while (true) {
     while (format[i] && format[i] != '{') {
       i++;
-    }
-
-    if (!format[i]) {
-      break;
     }
 
     if (i > plain_start) {
       FFMT__COUNT_OR_RETURN(
           total, ffmt_puts(out, &format[plain_start], i - plain_start));
+    }
+
+    if (!format[i]) {
+      break;
     }
 
     const char* spec_start = 0;
@@ -160,9 +144,6 @@ size_t ffmt_write(
     i++;
     plain_start = i;
   }
-
-  FFMT__COUNT_OR_RETURN(
-      total, ffmt_puts(out, &format[plain_start], i - plain_start));
 
   return total;
 }

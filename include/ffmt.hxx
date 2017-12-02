@@ -30,7 +30,9 @@ namespace ffmt {
     auto get_formatter(const char*) { return ::ffmt_formatter_str; }
     auto get_formatter(char) { return ::ffmt_formatter_char; }
     auto get_formatter(bool) { return ::ffmt_formatter_bool; }
+    auto get_formatter(int) { return ::ffmt_formatter_i64; }
     auto get_formatter(int64_t) { return ::ffmt_formatter_i64; }
+    auto get_formatter(unsigned int) { return ::ffmt_formatter_u64; }
     auto get_formatter(uint64_t) { return ::ffmt_formatter_u64; }
     // clang-format on
 

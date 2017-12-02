@@ -12,7 +12,16 @@ size_t ffmt_formatter_str(
   (void)spec;
   (void)spec_end;
 
-  return ffmt_puts(out, (const char*)arg.value, FFMT_AUTO);
+  ffmt_pad_t pad = FFMT_PAD_DEFAULT;
+  for (; spec != spec_end; spec++) {
+    switch (*spec) {
+      case FFMT__PAD_CASES:
+        spec = ffmt__parse_width_spec(spec, spec_end, &pad) - 1;
+        break;
+    }
+  }
+
+  return ffmt_puts_pad(out, (const char*)arg.value, FFMT_AUTO, pad);
 }
 
 size_t ffmt_formatter_bool(
@@ -75,18 +84,29 @@ size_t ffmt_formatter_u64(
   (void)args;
   (void)args_length;
 
-  uint length = 0;
+  char buffer[64];
+  char* current = buffer;
+
+  ffmt_pad_t pad = FFMT_PAD_DEFAULT;
 
   bool is_ptr = false;
   bool is_hex = false;
   bool is_upper_hex = false;
   bool has_prefix = false;
   for (; spec != spec_end; spec++) {
-    if (*spec == '#') has_prefix = true;
-    if (*spec == 'x') is_hex = true;
-    if (*spec == 'X') {
-      is_hex = true;
-      is_upper_hex = true;
+    switch (*spec) {
+      case 'X':
+        is_upper_hex = true;
+      /* fallthrough */
+      case 'x':
+        is_hex = true;
+        break;
+      case '#':
+        has_prefix = true;
+        break;
+      case FFMT__PAD_CASES:
+        spec = ffmt__parse_width_spec(spec, spec_end, &pad) - 1;
+        break;
     }
   }
 
@@ -94,8 +114,7 @@ size_t ffmt_formatter_u64(
   if (arg.formatter == ffmt_formatter_i64) {
     int64_t ival = (int64_t)(uint64_t)arg.value;
     if (ival < 0) {
-      length += 1;
-      ffmt_putc(out, '-');
+      *current++ = '-';
       val = -ival;
     } else {
       val = ival;
@@ -109,8 +128,8 @@ size_t ffmt_formatter_u64(
   }
 
   if (is_hex && has_prefix) {
-    length += 2;
-    ffmt_puts(out, "0x", 2);
+    *current++ = '0';
+    *current++ = 'x';
   }
 
   /* clang-format off */
@@ -119,20 +138,13 @@ size_t ffmt_formatter_u64(
     : ffmt__u64_digits_dec(val);
   /* clang-format on */
 
-  if (out->pos + digits >= out->buffer_size) {
-    ffmt_flush(out);
-    if (out->pos + digits >= out->buffer_size) {
-      return FFMT_ESMALLBUF;
-    }
-  }
-
-  char* const start = (char*)(out->buffer + out->pos);
   if (is_hex) {
-    ffmt__u64_to_hex_impl(val, start, digits, is_upper_hex);
+    ffmt__u64_to_hex_impl(val, current, digits, is_upper_hex);
   } else {
-    ffmt__u64_to_dec_impl(val, start, digits);
+    ffmt__u64_to_dec_impl(val, current, digits);
   }
 
-  out->pos += digits;
-  return length + digits;
+  current += digits;
+
+  return ffmt_puts_pad(out, buffer, current - buffer, pad);
 }
