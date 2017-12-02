@@ -40,9 +40,19 @@ ffmt_puts_pad(ffmt_out_t* out, const char* str, size_t length, ffmt_pad_t pad) {
     }
   }
 
+  if (pad.align == '>' && pad.width > length) {
+    FFMT__BUBBLE_ERROR(
+        ffmt__puts_repeat(out, pad.str, pad.str_length, pad.width - length));
+  }
+
   FFMT__BUBBLE_ERROR(ffmt__puts_base(out, str, length));
 
-  return length;
+  if (pad.align == '<' && pad.width > length) {
+    FFMT__BUBBLE_ERROR(
+        ffmt__puts_repeat(out, pad.str, pad.str_length, pad.width - length));
+  }
+
+  return pad.width;
 }
 
 size_t ffmt_write(

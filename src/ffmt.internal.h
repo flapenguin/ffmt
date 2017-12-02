@@ -125,4 +125,22 @@ ffmt__puts_base(ffmt_out_t* out, const char* str, size_t length) {
   return length;
 }
 
+static inline size_t ffmt__puts_repeat(
+    ffmt_out_t* out,
+    const char* str,
+    size_t length,
+    size_t desired) {
+  size_t rest = desired;
+  while (rest) {
+    size_t written;
+
+    FFMT__BUBBLE_ERROR_EX(
+        written, ffmt__puts_base(out, str, rest < length ? rest : length));
+
+    rest -= written;
+  }
+
+  return desired;
+}
+
 #endif /* FFMT_INTERNAL_H__ */

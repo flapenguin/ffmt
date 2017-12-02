@@ -146,18 +146,22 @@ static void test_format() {
 static void test_pad() {
   ss_output<64> out;
 
-  const char result[] = ""
-    "\n123456,foobar"
-    "\n123,foo"
-    "\n456,bar"
-    "\n";
+  const char result[] =
+    ".\n123456,foobar"
+    ".\n123,foo"
+    ".\n123456    ,foobar    "
+    ".\n456,bar"
+    ".\n    123456,    foobar"
+    ".\n";
 
   asserteq(str_size(result),
       out.write(
-        "\n{0},{1}"
-        "\n{0:<3},{1:<3}"
-        "\n{0:>3},{1:>3}"
-        "\n",
+        ".\n{0},{1}"
+        ".\n{0:<3},{1:<3}"
+        ".\n{0:<10},{1:<10}"
+        ".\n{0:>3},{1:>3}"
+        ".\n{0:>10},{1:>10}"
+        ".\n",
         123456,
         "foobar"));
 
