@@ -74,7 +74,7 @@ size_t ffmt_formatter_u64(
   if (out->pos + digits >= out->buffer_size) {
     ffmt_flush(out);
     if (out->pos + digits >= out->buffer_size) {
-      return FFMT_EFLUSH;
+      return FFMT_ESMALLBUF;
     }
   }
 

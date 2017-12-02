@@ -43,6 +43,16 @@
 #define FFMT_EFORMAT ((size_t)-2)
 #define FFMT_EARGLEN ((size_t)-3)
 #define FFMT_ENOFORMATTER ((size_t)-4)
+#define FFMT_ESMALLBUF ((size_t)-5)
+
+/* clang-format off */
+#define FFMT_FOREACH_ERROR(Fn)                                                 \
+    Fn(FFMT_EFLUSH, "Cannot flush.")                                           \
+    Fn(FFMT_EFORMAT, "Bad format.")                                            \
+    Fn(FFMT_EARGLEN, "Bad argmunent index.")                                   \
+    Fn(FFMT_ENOFORMATTER, "No formatter.")                                     \
+    Fn(FFMT_ESMALLBUF, "Buffer is too small.")
+/* clang-format on */
 
 /* Forward declarations */
 typedef struct ffmt_out_t ffmt_out_t;

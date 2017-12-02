@@ -3,19 +3,21 @@ Language: Cpp
 TabWidth: 2
 ColumnLimit: 80
 
-BreakBeforeBraces: Attach
 AlignAfterOpenBracket: AlwaysBreak
 PointerAlignment: Left
+
+BreakBeforeBraces: Attach
 BreakBeforeTernaryOperators: true
+AlwaysBreakTemplateDeclarations: true
 
 AllowAllParametersOfDeclarationOnNextLine: false
 BinPackParameters: false
 BinPackArguments: false
 
-AlwaysBreakTemplateDeclarations: true
-
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
 
 NamespaceIndentation: All
+IndentCaseLabels: true

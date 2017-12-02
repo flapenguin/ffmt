@@ -6,6 +6,7 @@ extern "C" {
 }
 
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 
 namespace ffmt {
@@ -53,6 +54,33 @@ namespace ffmt {
     }
   }
 
+  struct exception final : public std::runtime_error {
+    const size_t error_code;
+
+    exception(size_t error)
+        : std::runtime_error(_map_error_code(error)), error_code(error) {
+    }
+
+  private:
+    static const char* _map_error_code(size_t error) {
+      if (!ffmt_is_err(error)) {
+        return "Thrown by a mistake. (probably a bug in c++ wrapper)";
+      }
+
+      switch (error) {
+#define FFMT_CXX_WRAPPER_MAP_ERORR(Value, Description)                         \
+  case Value:                                                                  \
+    return #Value ": " Description;
+
+        FFMT_FOREACH_ERROR(FFMT_CXX_WRAPPER_MAP_ERORR)
+
+#undef FFMT_CXX_WRAPPER_MAP_ERORR
+        default:
+          return "Unknown error. (probably a bug in c++ wrapper)";
+      }
+    }
+  };
+
   struct out {
   public:
     struct backend_with_owner final {
@@ -82,15 +110,29 @@ namespace ffmt {
     }
 
     size_t puts(const char* s, size_t length = FFMT_AUTO) {
+      return _check(::ffmt::puts(backend.data, s, length));
+    }
+
+    size_t puts(std::nothrow_t, const char* s, size_t length = FFMT_AUTO) {
       return ::ffmt::puts(backend.data, s, length);
     }
 
     size_t putc(char c) {
+      return _check(::ffmt::putc(backend.data, c));
+    }
+
+    size_t putc(std::nothrow_t, char c) {
       return ::ffmt::putc(backend.data, c);
     }
 
     template <typename... Args>
     size_t write(const char* format, Args&&... args) {
+      return _check(
+          ::ffmt::write(backend.data, format, std::forward<Args>(args)...));
+    }
+
+    template <typename... Args>
+    size_t write(std::nothrow_t, const char* format, Args&&... args) {
       return ::ffmt::write(backend.data, format, std::forward<Args>(args)...);
     }
 
@@ -99,6 +141,14 @@ namespace ffmt {
       backend_with_owner* b =
           details::container_of_(self, &backend_with_owner::data);
       b->owner->flush();
+    }
+
+    static size_t _check(size_t result) {
+      if (ffmt_is_err(result)) {
+        throw exception(result);
+      }
+
+      return result;
     }
   };
 } // namespace ffmt

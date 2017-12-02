@@ -12,58 +12,6 @@ static inline size_t array_size(T (&x)[Size]) { return Size; }
 template <size_t Size>
 static inline size_t str_size(const char (&x)[Size]) { return Size - 1; }
 
-static void asserteq(const char* expected, const char* actual) {
-  if (strcmp(expected, actual)) {
-    fprintf(stderr, "expected '%s', but got '%s'\n", expected, actual);
-    failed = true;
-  }
-}
-
-static void asserteq(const char* expected, const std::stringstream& actual) {
-  asserteq(expected, actual.str().c_str());
-}
-
-static void asserteq(size_t expected, size_t actual) {
-  asserteq(std::to_string(expected).c_str(), std::to_string(actual).c_str());
-}
-
-static void assert_write(size_t expected, size_t actual) {
-  if (expected != actual) {
-    fprintf(stderr, "expected %zd, but got %zd\n", (ssize_t)expected, (ssize_t)actual);
-    failed = true;
-  }
-}
-
-static void test_smoke() {
-  static std::stringstream output;
-
-  static char buffer[256];
-  ffmt_out_t out = { (uint8_t*)&buffer[0], sizeof(buffer), 0, [](ffmt_out_t* self) {
-    output.write((const char*)self->buffer, self->pos);
-    self->pos = 0;
-  }};
-
-  asserteq("", output);
-
-  ffmt::putc(out, '1');
-  asserteq("", output);
-
-  ffmt::flush(out);
-  asserteq("1", output);
-
-  ffmt::putc(out, '2');
-  asserteq("1", output);
-
-  ffmt::flush(out);
-  asserteq("12", output);
-
-  ffmt::puts(out, "qwerty");
-  asserteq("12", output);
-
-  ffmt::flush(out);
-  asserteq("12qwerty", output);
-}
-
 template <size_t BufferSize>
 struct ss_output : public ffmt::out {
 private:
@@ -85,19 +33,62 @@ public:
     _ss.clear();
   }
 
-  auto& get_sringstream() {
+  std::stringstream& get_stringstream() {
     return _ss;
   }
 };
+
+static void asserteq(const char* expected, const char* actual) {
+  if (strcmp(expected, actual)) {
+    fprintf(stderr, "expected '%s', but got '%s'\n", expected, actual);
+    failed = true;
+  }
+}
+
+template <template<size_t BufferSize> class ss_output, size_t BufferSize>
+static void asserteq(const char* expected, ss_output<BufferSize>& out) {
+  asserteq(expected, out.get_stringstream().str().c_str());
+}
+
+static void asserteq(size_t expected, size_t actual) {
+  if (expected != actual) {
+    fprintf(stderr, "expected %zd, but got %zd\n", (ssize_t)expected, (ssize_t)actual);
+    failed = true;
+  }
+}
+
+static void test_smoke() {
+  ss_output<256> out;
+
+  asserteq("", out);
+
+  out.putc('1');
+  asserteq("", out);
+
+  out.flush();
+  asserteq("1", out);
+
+  out.putc('2');
+  asserteq("1", out);
+
+  out.flush();
+  asserteq("12", out);
+
+  out.puts("qwerty");
+  asserteq("12", out);
+
+  out.flush();
+  asserteq("12qwerty", out);
+}
 
 static void test_flush() {
   ss_output<8> out;
 
   out.puts("0123456789");
-  asserteq("01234567", out.get_sringstream());
+  asserteq("01234567", out);
 
   out.flush();
-  asserteq("0123456789", out.get_sringstream());
+  asserteq("0123456789", out);
 }
 
 static void test_format() {
@@ -106,10 +97,10 @@ static void test_format() {
   {
     const char result[] = "<foo><bar>";
 
-    assert_write(str_size(result), out.write("{1}{3}{2}{1}{0}{2}", "bar", "<", ">", "foo"));
+    asserteq(str_size(result), out.write("{1}{3}{2}{1}{0}{2}", "bar", "<", ">", "foo"));
 
     out.flush();
-    asserteq(result, out.get_sringstream());
+    asserteq(result, out);
     out.clear();
   }
 
@@ -117,17 +108,17 @@ static void test_format() {
     const char result[] = "12302652060662169617,123456789123456789,-123456789123456789,"
       "aabbccddeeff0011,0xaabbccddeeff0011,AABBCCDDEEFF0011,0xAABBCCDDEEFF0011";
 
-    assert_write(str_size(result),
+    asserteq(str_size(result),
         out.write("{0},{1},{2},{0:x},{0:#x},{0:X},{0:#X}",
           0xaabbccddeeff0011, 123456789123456789UL, -123456789123456789L));
 
     out.flush();
-    asserteq(result, out.get_sringstream());
+    asserteq(result, out);
     out.clear();
   }
 
-  asserteq(FFMT_EFORMAT, out.write("{...}"));
-  asserteq(FFMT_EARGLEN, out.write("{1}"));
+  asserteq(FFMT_EFORMAT, out.write(std::nothrow, "{...}"));
+  asserteq(FFMT_EARGLEN, out.write(std::nothrow, "{1}"));
 
   {
     const ffmt_arg_t args[] = { {0, (const void*)"nope" } };
@@ -136,10 +127,25 @@ static void test_format() {
   }
 }
 
+static void test_throw() {
+  try {
+    ss_output<18> out;
+    out.write("{}", 0xaabbccddeeff0011);
+  }
+  catch (ffmt::exception& e) {
+    asserteq(FFMT_ESMALLBUF, e.error_code);
+  }
+  catch (...) {
+    fprintf(stderr, "Something else failed.\n");
+    failed = 1;
+  }
+}
+
 int main() {
   test_smoke();
   test_flush();
   test_format();
+  test_throw();
 
   return failed ? 1 : 0;
 }
