@@ -6,7 +6,7 @@ tmp="`mktemp`"
 . "$(dirname $0)/config.sh"
 
 for file in src/*; do
-  clang-format -style=file "$file" >"$tmp"
+  clang_format -style=file "$file" >"$tmp"
   chmod --reference="$file" "$tmp"
 
   git --no-pager diff --quiet -- "$file" "$tmp"
@@ -25,5 +25,9 @@ for file in src/*; do
 done
 
 rm "$tmp"
-[ $err -ne 0 ] && echo "linter failed" >&2
+if [ $err -eq 0 ]; then
+  printf "\033[32m=== linter ok===\033[0m\n"
+else
+  printf "\n\033[31m=== linter failed===\033[0m\n" >&2
+fi
 exit $err

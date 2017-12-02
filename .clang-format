@@ -14,3 +14,4 @@ BinPackArguments: false
 
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: false
