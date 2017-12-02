@@ -59,15 +59,13 @@ struct ffmt_arg_t {
 
 
 // API
-static inline void ffmt_flush(ffmt_out_t* out) {
-  out->flush(out);
-}
-
 static inline bool ffmt_is_err(size_t value) {
   return value >= (size_t)-4096;
 }
 
 // API + ABI
+extern void ffmt_flush(ffmt_out_t* out);
+
 extern size_t ffmt_putc(ffmt_out_t* out, char c);
 extern size_t ffmt_puts(ffmt_out_t* out, const char* str, size_t length);
 

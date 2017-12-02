@@ -1,6 +1,8 @@
 #include "ffmt.internal.h"
 
-static inline bool ffmt__is_digit(char c) { return '0' <= c && c <= '9'; }
+static inline bool ffmt__is_digit(char c) {
+  return '0' <= c && c <= '9';
+}
 
 static inline const char* ffmt__strchr(const char* str, const char* breaks) {
   for (; *str; str++) {
@@ -12,6 +14,10 @@ static inline const char* ffmt__strchr(const char* str, const char* breaks) {
   }
 
   return 0;
+}
+
+void ffmt_flush(ffmt_out_t* out) {
+  out->flush(out);
 }
 
 size_t ffmt_putc(ffmt_out_t* out, char c) {
