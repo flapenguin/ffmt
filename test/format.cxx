@@ -152,6 +152,13 @@ static void test_pad() {
     ".\n123456    ,foobar    "
     ".\n456,bar"
     ".\n    123456,    foobar"
+    ".\n  123456  ,  foobar  "
+    ".\n1234567,foobar!"
+    ".\n123,foo"
+    ".\n1234567   ,foobar!   "
+    ".\n567,ar!"
+    ".\n   1234567,   foobar!"
+    ".\n 1234567  , foobar!  "
     ".\n";
 
   asserteq(str_size(result),
@@ -161,13 +168,21 @@ static void test_pad() {
         ".\n{0:<10},{1:<10}"
         ".\n{0:>3},{1:>3}"
         ".\n{0:>10},{1:>10}"
+        ".\n{0:^10},{1:^10}"
+        ".\n{2},{3}"
+        ".\n{2:<3},{3:<3}"
+        ".\n{2:<10},{3:<10}"
+        ".\n{2:>3},{3:>3}"
+        ".\n{2:>10},{3:>10}"
+        ".\n{2:^10},{3:^10}"
         ".\n",
         123456,
-        "foobar"));
+        "foobar",
+        1234567,
+        "foobar!"));
 
   out.flush();
   asserteq(result, out);
-  out.clear();
 }
 
 static void test_throw() {

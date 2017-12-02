@@ -21,7 +21,7 @@ void ffmt__u64_to_hex_impl(
 #define FFMT__PAD_CASES '<': case '>': case '^'
 /* clang-format on */
 
-#define FFMT__BUBBLE_ERROR(Expression)                                         \
+#define FFMT__TRY(Expression)                                                  \
   do {                                                                         \
     const size_t __written = Expression;                                       \
     if (ffmt_is_err(__written)) {                                              \
@@ -29,7 +29,7 @@ void ffmt__u64_to_hex_impl(
     }                                                                          \
   } while (0)
 
-#define FFMT__BUBBLE_ERROR_EX(Out, Expression)                                 \
+#define FFMT__TRY_EX(Out, Expression)                                          \
   do {                                                                         \
     Out = Expression;                                                          \
     if (ffmt_is_err(Out)) {                                                    \
@@ -134,7 +134,7 @@ static inline size_t ffmt__puts_repeat(
   while (rest) {
     size_t written;
 
-    FFMT__BUBBLE_ERROR_EX(
+    FFMT__TRY_EX(
         written, ffmt__puts_base(out, str, rest < length ? rest : length));
 
     rest -= written;

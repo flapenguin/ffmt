@@ -25,31 +25,52 @@ size_t ffmt_puts(ffmt_out_t* out, const char* str, size_t length) {
 
 extern size_t
 ffmt_puts_pad(ffmt_out_t* out, const char* str, size_t length, ffmt_pad_t pad) {
-  if (!pad.align || !pad.width) {
+  if (!pad.align || !pad.width || pad.width == length) {
     return ffmt_puts(out, str, length);
   }
 
   length = ffmt__fix_length(str, length);
 
-  if (pad.align && pad.width < length) {
-    if (pad.align == '<') {
-      length = pad.width;
-    } else if (pad.align == '>') {
-      str += (length - pad.width);
-      length -= pad.width;
-    }
+  size_t left_pad = 0;
+  size_t right_pad = 0;
+
+  switch (pad.align) {
+    case '<':
+      if (pad.width < length) {
+        length = pad.width;
+      } else {
+        right_pad = pad.width - length;
+      }
+      break;
+    case '>':
+      if (pad.width < length) {
+        str += (length - pad.width);
+        length = pad.width;
+      } else {
+        left_pad = pad.width - length;
+      }
+      break;
+    case '^':
+      if (pad.width < length) {
+        str += (length - pad.width) / 2;
+        length = pad.width;
+      } else {
+        left_pad = (pad.width - length) / 2;
+        right_pad = pad.width - length - left_pad;
+      }
+      break;
+    default:
+      return FFMT_EALIGN;
   }
 
-  if (pad.align == '>' && pad.width > length) {
-    FFMT__BUBBLE_ERROR(
-        ffmt__puts_repeat(out, pad.str, pad.str_length, pad.width - length));
+  if (left_pad) {
+    FFMT__TRY(ffmt__puts_repeat(out, pad.str, pad.str_length, left_pad));
   }
 
-  FFMT__BUBBLE_ERROR(ffmt__puts_base(out, str, length));
+  FFMT__TRY(ffmt__puts_base(out, str, length));
 
-  if (pad.align == '<' && pad.width > length) {
-    FFMT__BUBBLE_ERROR(
-        ffmt__puts_repeat(out, pad.str, pad.str_length, pad.width - length));
+  if (right_pad) {
+    FFMT__TRY(ffmt__puts_repeat(out, pad.str, pad.str_length, right_pad));
   }
 
   return pad.width;

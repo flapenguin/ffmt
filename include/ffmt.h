@@ -19,6 +19,7 @@
 #define FFMT_EARGLEN ((size_t)-3)
 #define FFMT_ENOFORMATTER ((size_t)-4)
 #define FFMT_ESMALLBUF ((size_t)-5)
+#define FFMT_EALIGN ((size_t)-6)
 
 /* clang-format off */
 
@@ -48,7 +49,8 @@
     Fn(FFMT_EFORMAT, "Bad format.")                                            \
     Fn(FFMT_EARGLEN, "Bad argmunent index.")                                   \
     Fn(FFMT_ENOFORMATTER, "No formatter.")                                     \
-    Fn(FFMT_ESMALLBUF, "Buffer is too small.")
+    Fn(FFMT_ESMALLBUF, "Buffer is too small.")                                 \
+    Fn(FFMT_EALIGN, "Bad alignment option.")
 /* clang-format on */
 
 /* Forward declarations */
