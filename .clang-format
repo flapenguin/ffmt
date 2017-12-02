@@ -5,6 +5,7 @@ ColumnLimit: 80
 
 AlignAfterOpenBracket: AlwaysBreak
 PointerAlignment: Left
+AlignOperands: false
 
 BreakBeforeBraces: Attach
 BreakBeforeTernaryOperators: true

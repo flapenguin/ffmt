@@ -77,6 +77,10 @@ size_t ffmt_write(
       i++;
     }
 
+    if (!format[i]) {
+      break;
+    }
+
     if (i > plain_start) {
       FFMT__COUNT_OR_RETURN(
           total, ffmt_puts(out, &format[plain_start], i - plain_start));

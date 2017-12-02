@@ -19,12 +19,12 @@ void ffmt__u64_to_hex_impl(
   const char* const hex_lookup =
       upper ? "0123456789ABCDEF" : "0123456789abcdef";
 
-  uint pos = digits - 1;
+  int pos = digits - 1;
   do {
     buffer[pos--] = hex_lookup[value & 0xf];
     buffer[pos--] = hex_lookup[(value >> 4) & 0xf];
     value >>= 8;
-  } while (value);
+  } while (pos > 0);
 }
 
 int ffmt_u64_to_hex(

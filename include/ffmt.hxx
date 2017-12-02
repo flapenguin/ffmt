@@ -24,6 +24,9 @@ namespace ffmt {
 
   namespace arg_packers {
     // clang-format off
+    template <typename T>
+    auto get_formatter(const T*) { return ::ffmt_formatter_ptr; }
+
     auto get_formatter(const char*) { return ::ffmt_formatter_str; }
     auto get_formatter(char) { return ::ffmt_formatter_char; }
     auto get_formatter(bool) { return ::ffmt_formatter_bool; }

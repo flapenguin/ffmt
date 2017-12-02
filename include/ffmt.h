@@ -96,5 +96,6 @@ extern FFMT_FORMATTER_DECL(ffmt_formatter_char);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_i64);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_u64);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_bool);
+extern FFMT_FORMATTER_DECL(ffmt_formatter_ptr);
 
 #endif /* FFMT_H__ */
