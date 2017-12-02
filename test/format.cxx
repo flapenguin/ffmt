@@ -1,6 +1,4 @@
-extern "C" {
-#include "ffmt.h"
-}
+#include "ffmt.hxx"
 
 #include <cstring>
 #include <cstdio>
@@ -47,89 +45,94 @@ static void test_smoke() {
 
   asserteq("", output);
 
-  ffmt_putc(&out, '1');
+  ffmt::putc(out, '1');
   asserteq("", output);
 
-  ffmt_flush(&out);
+  ffmt::flush(out);
   asserteq("1", output);
 
-  ffmt_putc(&out, '2');
+  ffmt::putc(out, '2');
   asserteq("1", output);
 
-  ffmt_flush(&out);
+  ffmt::flush(out);
   asserteq("12", output);
 
-  ffmt_puts(&out, "qwerty", FFMT_AUTO);
+  ffmt::puts(out, "qwerty");
   asserteq("12", output);
 
-  ffmt_flush(&out);
+  ffmt::flush(out);
   asserteq("12qwerty", output);
 }
 
+template <size_t BufferSize>
+struct ss_output : public ffmt::out {
+private:
+  std::stringstream _ss;
+  char _buffer[BufferSize];
+public:
+  ss_output() {
+    this->backend.data.buffer = (uint8_t*)&this->_buffer;
+    this->backend.data.buffer_size = array_size(this->_buffer);
+  }
+
+  void flush() override {
+    this->_ss.write((const char*)this->backend.data.buffer, this->backend.data.pos);
+    this->backend.data.pos = 0;
+  }
+
+  void clear() {
+    _ss.str("");
+    _ss.clear();
+  }
+
+  auto& get_sringstream() {
+    return _ss;
+  }
+};
+
 static void test_flush() {
-  static std::stringstream output;
-  static char buffer[8];
-  ffmt_out_t out = { (uint8_t*)&buffer[0], sizeof(buffer), 0, [](ffmt_out_t* self) {
-    output.write((const char*)self->buffer, self->pos);
-    self->pos = 0;
-  }};
+  ss_output<8> out;
 
-  ffmt_puts(&out, "0123456789", FFMT_AUTO);
-  asserteq("01234567", output);
+  out.puts("0123456789");
+  asserteq("01234567", out.get_sringstream());
 
-  ffmt_flush(&out);
-  asserteq("0123456789", output);
+  out.flush();
+  asserteq("0123456789", out.get_sringstream());
 }
 
 static void test_format() {
-  static std::stringstream output;
-  static char buffer[64];
-  ffmt_out_t out = { (uint8_t*)&buffer[0], sizeof(buffer), 0, [](ffmt_out_t* self) {
-    output.write((const char*)self->buffer, self->pos);
-    self->pos = 0;
-  }};
-  static auto reset = []() {
-    output.str("");
-    output.clear();
-  };
+  ss_output<64> out;
 
   {
     const char result[] = "<foo><bar>";
-    const ffmt_arg_t args[] = {
-      { ffmt_formatter_str, (const void*)"bar" },
-      { ffmt_formatter_str, (const void*)"<" },
-      { ffmt_formatter_str, (const void*)">" },
-      { ffmt_formatter_str, (const void*)"foo" },
-    };
 
-    assert_write(str_size(result), ffmt_write(&out, "{1}{3}{2}{1}{0}{2}", args, array_size(args)));
-    ffmt_flush(&out);
-    asserteq(result, output);
-    reset();
+    assert_write(str_size(result), out.write("{1}{3}{2}{1}{0}{2}", "bar", "<", ">", "foo"));
+
+    out.flush();
+    asserteq(result, out.get_sringstream());
+    out.clear();
   }
 
   {
     const char result[] = "12302652060662169617,123456789123456789,-123456789123456789,"
       "aabbccddeeff0011,0xaabbccddeeff0011,AABBCCDDEEFF0011,0xAABBCCDDEEFF0011";
-    const ffmt_arg_t args[] = {
-      { ffmt_formatter_u64, (const void*)0xaabbccddeeff0011 },
-      { ffmt_formatter_u64, (const void*)123456789123456789L },
-      { ffmt_formatter_i64, (const void*)-123456789123456789L }
-    };
 
-    assert_write(str_size(result), ffmt_write(&out, "{0},{1},{2},{0:x},{0:#x},{0:X},{0:#X}", args, array_size(args)));
-    ffmt_flush(&out);
-    asserteq(result, output);
-    reset();
+    assert_write(str_size(result),
+        out.write("{0},{1},{2},{0:x},{0:#x},{0:X},{0:#X}",
+          0xaabbccddeeff0011, 123456789123456789UL, -123456789123456789L));
+
+    out.flush();
+    asserteq(result, out.get_sringstream());
+    out.clear();
   }
 
-  asserteq(FFMT_EFORMAT, ffmt_write(&out, "{...}", 0, 0));
-  asserteq(FFMT_EARGLEN, ffmt_write(&out, "{1}", 0, 0));
+  asserteq(FFMT_EFORMAT, out.write("{...}"));
+  asserteq(FFMT_EARGLEN, out.write("{1}"));
 
   {
     const ffmt_arg_t args[] = { {0, (const void*)"nope" } };
-    asserteq(FFMT_ENOFORMATTER, ffmt_write(&out, "{0}", args, array_size(args)));
-    reset();
+    asserteq(FFMT_ENOFORMATTER, ::ffmt_write(&out.get_ffmt_out(), "{0}", args, array_size(args)));
+    out.clear();
   }
 }
 

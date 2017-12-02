@@ -12,6 +12,10 @@ AllowAllParametersOfDeclarationOnNextLine: false
 BinPackParameters: false
 BinPackArguments: false
 
+AlwaysBreakTemplateDeclarations: true
+
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: false
+
+NamespaceIndentation: All

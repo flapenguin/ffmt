@@ -78,7 +78,7 @@ size_t ffmt_formatter_u64(
     }
   }
 
-  const char* start = (char*)(out->buffer + out->pos);
+  char* const start = (char*)(out->buffer + out->pos);
   if (is_hex) {
     ffmt__u64_to_hex_impl(val, start, digits, is_upper_hex);
   } else {
