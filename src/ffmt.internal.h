@@ -37,14 +37,11 @@ void ffmt__u64_to_hex_impl(
     }                                                                          \
   } while (0)
 
-#define FFMT__COUNT_OR_RETURN(Counter, Expression)                             \
+#define FFMT__TRY_ADVANCE(Counter, Expression)                                 \
   do {                                                                         \
-    const size_t __written = Expression;                                       \
-    if (ffmt_is_err(__written)) {                                              \
-      return __written;                                                        \
-    } else {                                                                   \
-      Counter += __written;                                                    \
-    }                                                                          \
+    size_t __written;                                                          \
+    FFMT__TRY_EX(__written, Expression);                                       \
+    Counter += __written;                                                      \
   } while (0)
 
 static inline bool ffmt__is_digit(char c) {

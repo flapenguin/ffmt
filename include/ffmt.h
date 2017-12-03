@@ -44,12 +44,12 @@
     const char* spec, \
     const char* spec_end)
 
-#define FFMT_FOREACH_ERROR(Fn)                                                 \
-    Fn(FFMT_EFLUSH, "Cannot flush.")                                           \
-    Fn(FFMT_EFORMAT, "Bad format.")                                            \
-    Fn(FFMT_EARGLEN, "Bad argmunent index.")                                   \
-    Fn(FFMT_ENOFORMATTER, "No formatter.")                                     \
-    Fn(FFMT_ESMALLBUF, "Buffer is too small.")                                 \
+#define FFMT_FOREACH_ERROR(Fn) \
+    Fn(FFMT_EFLUSH, "Cannot flush.") \
+    Fn(FFMT_EFORMAT, "Bad format.") \
+    Fn(FFMT_EARGLEN, "Bad argmunent index.") \
+    Fn(FFMT_ENOFORMATTER, "No formatter.") \
+    Fn(FFMT_ESMALLBUF, "Buffer is too small.") \
     Fn(FFMT_EALIGN, "Bad alignment option.")
 /* clang-format on */
 

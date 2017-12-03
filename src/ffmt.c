@@ -93,7 +93,7 @@ size_t ffmt_write(
     }
 
     if (i > plain_start) {
-      FFMT__COUNT_OR_RETURN(
+      FFMT__TRY_ADVANCE(
           total, ffmt_puts(out, &format[plain_start], i - plain_start));
     }
 
@@ -165,7 +165,7 @@ size_t ffmt_write(
       return FFMT_ENOFORMATTER;
     }
 
-    FFMT__COUNT_OR_RETURN(
+    FFMT__TRY_ADVANCE(
         total, formatter(out, arg, args, args_length, spec_start, spec_end));
 
     if (!position_args) {
