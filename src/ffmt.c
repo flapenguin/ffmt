@@ -84,69 +84,49 @@ size_t ffmt_write(
   size_t total = 0;
   bool position_args = false;
   size_t arg_ix = 0;
-  size_t plain_start = 0;
-  size_t i = 0;
 
+  const char* curr = format;
+  const char* plain_start;
   while (true) {
-    while (format[i] && format[i] != '{') {
-      i++;
+    plain_start = curr;
+    while (*curr && *curr != '{') {
+      curr++;
     }
 
-    if (i > plain_start) {
-      FFMT__TRY_ADVANCE(
-          total, ffmt_puts(out, &format[plain_start], i - plain_start));
+    if (curr > plain_start) {
+      FFMT__TRY_ADVANCE(total, ffmt_puts(out, plain_start, curr - plain_start));
     }
 
-    if (!format[i]) {
+    if (!*curr) {
       break;
     }
 
+    /* Skip '{'. */
+    curr++;
+
     const char* spec_start = 0;
     const char* spec_end = 0;
-    const char* formatter_start = 0;
-    const char* formatter_end = 0;
 
-    i++;
-
-    if (ffmt__is_digit(format[i])) {
+    if (ffmt__is_digit(*curr)) {
       position_args = true;
-      arg_ix = 0;
-      do {
-        arg_ix = arg_ix * 10 + (format[i] - '0');
-        i++;
-      } while (ffmt__is_digit(format[i]));
-    } else {
-      if (position_args) {
-        return FFMT_EFORMAT;
-      }
+      /* 4 digits seems reasonable amount for argument reference */
+      curr = ffmt__parse_u64(curr, curr + 4, &arg_ix);
+    } else if (position_args) {
+      return FFMT_EFORMAT;
     }
 
-    if (format[i] == ':') {
-      i++;
-      spec_start = &format[i];
+    if (*curr == ':') {
+      curr++;
+      spec_start = curr;
       spec_end = ffmt__strchr(spec_start, ":}");
       if (!spec_end) {
         return FFMT_EFORMAT;
       }
 
-      i = spec_end - format;
-
-      if (format[i] == ':') {
-        formatter_start = spec_start;
-        formatter_end = spec_end;
-
-        i++;
-        spec_start = &format[i];
-        spec_end = ffmt__strchr(spec_start, ":}");
-        if (!spec_end) {
-          return FFMT_EFORMAT;
-        }
-
-        i = spec_end - format;
-      }
+      curr = spec_end;
     }
 
-    if (format[i] != '}') {
+    if (*curr != '}') {
       return FFMT_EFORMAT;
     }
 
@@ -156,10 +136,6 @@ size_t ffmt_write(
 
     const ffmt_arg_t arg = args[arg_ix];
     ffmt_formatter_t formatter = arg.formatter;
-
-    if (formatter_end != formatter_start) {
-      // TODO
-    }
 
     if (!formatter) {
       return FFMT_ENOFORMATTER;
@@ -172,8 +148,7 @@ size_t ffmt_write(
       arg_ix++;
     }
 
-    i++;
-    plain_start = i;
+    curr++;
   }
 
   return total;

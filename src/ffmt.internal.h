@@ -61,8 +61,8 @@ static inline const char* ffmt__strchr(const char* str, const char* breaks) {
 }
 
 static inline const char*
-ffmt__parse_uint(const char* start, const char* end, uint* value) {
-  uint result = 0;
+ffmt__parse_u64(const char* start, const char* end, uint64_t* value) {
+  uint64_t result = 0;
 
   const char* str = start;
   for (; ffmt__is_digit(*str) && str != end; str++) {
@@ -104,12 +104,13 @@ static inline const char* ffmt__parse_pad_spec(
     start++;
   }
 
-  uint width = 0;
-  start = ffmt__parse_uint(start, end, &width);
-  if (ref && width < args_length) {
-    result.width = (uint64_t)args[width].value;
-  } else {
-    result.width = width;
+  start = ffmt__parse_u64(start, end, &result.width);
+  if (ref) {
+    if (result.width < args_length) {
+      result.width = (uint64_t)args[result.width].value;
+    } else {
+      result.width = 0;
+    }
   }
 
   if (!result.width) {
