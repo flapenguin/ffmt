@@ -16,7 +16,8 @@ size_t ffmt_formatter_str(
   for (; spec != spec_end; spec++) {
     switch (*spec) {
       case FFMT__PAD_CASES:
-        spec = ffmt__parse_pad_spec(spec, spec_end, &pad) - 1;
+        spec =
+            ffmt__parse_pad_spec(spec, spec_end, &pad, args, args_length) - 1;
         break;
     }
   }
@@ -105,7 +106,8 @@ size_t ffmt_formatter_u64(
         has_prefix = true;
         break;
       case FFMT__PAD_CASES:
-        spec = ffmt__parse_pad_spec(spec, spec_end, &pad) - 1;
+        spec =
+            ffmt__parse_pad_spec(spec, spec_end, &pad, args, args_length) - 1;
         break;
     }
   }

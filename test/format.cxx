@@ -163,6 +163,7 @@ static void test_pad() {
     ".\n   1234567,   foobar!"
     ".\n 1234567  , foobar!  "
     ".\n.1234567..,.foobar!.."
+    ".\n......custom,custom...... (width = 12)"
     ".\n";
 
   const char format[] =
@@ -181,6 +182,7 @@ static void test_pad() {
     ".\n{2:>10},{3:>10}"
     ".\n{2:^10},{3:^10}"
     ".\n{2:^(.)10},{3:^(.)10}"
+    ".\n{4:>(.)@5},{4:<(.)@5} (width = {5})"
     ".\n";
 
   asserteq(str_size(result),
@@ -189,7 +191,9 @@ static void test_pad() {
         123456,
         "foobar",
         1234567,
-        "foobar!"));
+        "foobar!",
+        "custom",
+        12));
 
   out.flush();
   asserteq(result, out);

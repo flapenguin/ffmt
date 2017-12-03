@@ -73,8 +73,12 @@ ffmt__parse_uint(const char* start, const char* end, uint* value) {
   return str;
 }
 
-static inline const char*
-ffmt__parse_pad_spec(const char* start, const char* end, ffmt_pad_t* value) {
+static inline const char* ffmt__parse_pad_spec(
+    const char* start,
+    const char* end,
+    ffmt_pad_t* value,
+    const ffmt_arg_t* args,
+    size_t args_length) {
   ffmt_pad_t result = *value;
 
   result.align = *start++;
@@ -94,9 +98,19 @@ ffmt__parse_pad_spec(const char* start, const char* end, ffmt_pad_t* value) {
     start++;
   }
 
-  uint width;
+  bool ref = false;
+  if (*start == '@') {
+    ref = true;
+    start++;
+  }
+
+  uint width = 0;
   start = ffmt__parse_uint(start, end, &width);
-  result.width = width;
+  if (ref && width < args_length) {
+    result.width = (uint64_t)args[width].value;
+  } else {
+    result.width = width;
+  }
 
   if (!result.width) {
     result.align = '\0';
