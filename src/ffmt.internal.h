@@ -74,10 +74,26 @@ ffmt__parse_uint(const char* start, const char* end, uint* value) {
 }
 
 static inline const char*
-ffmt__parse_width_spec(const char* start, const char* end, ffmt_pad_t* value) {
+ffmt__parse_pad_spec(const char* start, const char* end, ffmt_pad_t* value) {
   ffmt_pad_t result = *value;
 
   result.align = *start++;
+
+  if (start != end && *start == '(') {
+    start++;
+    result.str = start;
+    while (*start != ')' && start != end) {
+      start++;
+    }
+
+    if (start == end) {
+      return start;
+    }
+
+    result.str_length = start - result.str;
+    start++;
+  }
+
   uint width;
   start = ffmt__parse_uint(start, end, &width);
   result.width = width;
