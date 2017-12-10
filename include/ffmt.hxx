@@ -6,7 +6,7 @@ extern "C" {
 }
 
 #include <cstddef>
-#include <stdexcept>
+#include <exception>
 #include <utility>
 
 namespace ffmt {
@@ -62,17 +62,8 @@ namespace ffmt {
     Container* container_of_(Member* ptr, const Member Container::*member) {
       return (Container*)((char*)ptr - offset_of_(member));
     }
-  }
 
-  struct exception final : public std::runtime_error {
-    const size_t error_code;
-
-    exception(size_t error)
-        : std::runtime_error(_map_error_code(error)), error_code(error) {
-    }
-
-  private:
-    static const char* _map_error_code(size_t error) {
+    static const char* map_error_code(size_t error) noexcept {
       if (!ffmt_is_err(error)) {
         return "Thrown by a mistake. (probably a bug in c++ wrapper)";
       }
@@ -88,6 +79,22 @@ namespace ffmt {
         default:
           return "Unknown error. (probably a bug in c++ wrapper)";
       }
+    }
+  }
+
+  struct exception final : public std::exception {
+  private:
+    const char* const msg;
+
+  public:
+    const size_t error_code;
+
+    exception(size_t error)
+        : msg(details::map_error_code(error)), error_code(error) {
+    }
+
+    const char* what() const noexcept override {
+      return msg;
     }
   };
 
