@@ -12,17 +12,7 @@
 #define FFMT_VER_MINOR 1
 #define FFMT_VER_PATCH 0
 
-#define FFMT_AUTO ((size_t)-1)
-
-#define FFMT_EFLUSH ((size_t)-1)
-#define FFMT_EFORMAT ((size_t)-2)
-#define FFMT_EARGLEN ((size_t)-3)
-#define FFMT_ENOFORMATTER ((size_t)-4)
-#define FFMT_ESMALLBUF ((size_t)-5)
-#define FFMT_EALIGN ((size_t)-6)
-
 /* clang-format off */
-
 #define FFMT_VER ( \
     FFMT_VER_MAJOR * 0x10000 + \
     FFMT_VER_MINOR * 0x100 + \
@@ -34,7 +24,28 @@
     FFMT__STR(FFMT_VER_MINOR) "." \
     FFMT__STR(FFMT_VER_PATCH) \
   )
+/* clang-format on */
 
+#define FFMT_AUTO ((size_t)-1)
+
+#define FFMT_EFLUSH ((size_t)-1)
+#define FFMT_EFORMAT ((size_t)-2)
+#define FFMT_EARGLEN ((size_t)-3)
+#define FFMT_ENOFORMATTER ((size_t)-4)
+#define FFMT_ESMALLBUF ((size_t)-5)
+#define FFMT_EALIGN ((size_t)-6)
+
+/* clang-format off */
+#define FFMT_FOREACH_ERROR(Fn) \
+    Fn(FFMT_EFLUSH, "Cannot flush.") \
+    Fn(FFMT_EFORMAT, "Bad format.") \
+    Fn(FFMT_EARGLEN, "Bad argument index.") \
+    Fn(FFMT_ENOFORMATTER, "No formatter.") \
+    Fn(FFMT_ESMALLBUF, "Buffer is too small.") \
+    Fn(FFMT_EALIGN, "Bad alignment option.")
+/* clang-format on */
+
+/* clang-format off */
 #define FFMT_FORMATTER_DECL(Name) \
   size_t Name( \
     ffmt_out_t* out, \
@@ -43,14 +54,6 @@
     size_t args_length, \
     const char* spec, \
     const char* spec_end)
-
-#define FFMT_FOREACH_ERROR(Fn) \
-    Fn(FFMT_EFLUSH, "Cannot flush.") \
-    Fn(FFMT_EFORMAT, "Bad format.") \
-    Fn(FFMT_EARGLEN, "Bad argmunent index.") \
-    Fn(FFMT_ENOFORMATTER, "No formatter.") \
-    Fn(FFMT_ESMALLBUF, "Buffer is too small.") \
-    Fn(FFMT_EALIGN, "Bad alignment option.")
 /* clang-format on */
 
 /* Forward declarations */

@@ -69,13 +69,13 @@ namespace ffmt {
       }
 
       switch (error) {
-#define FFMT_CXX_WRAPPER_MAP_ERORR(Value, Description)                         \
+#define FFMT_CXX_WRAPPER_MAP_ERROR(Value, Description)                         \
   case Value:                                                                  \
     return #Value ": " Description;
 
-        FFMT_FOREACH_ERROR(FFMT_CXX_WRAPPER_MAP_ERORR)
+        FFMT_FOREACH_ERROR(FFMT_CXX_WRAPPER_MAP_ERROR)
 
-#undef FFMT_CXX_WRAPPER_MAP_ERORR
+#undef FFMT_CXX_WRAPPER_MAP_ERROR
         default:
           return "Unknown error. (probably a bug in c++ wrapper)";
       }
@@ -130,7 +130,8 @@ namespace ffmt {
       return _check(::ffmt::puts(backend.data, s, length));
     }
 
-    size_t puts(std::nothrow_t, const char* s, size_t length = FFMT_AUTO) {
+    size_t
+    puts(std::nothrow_t, const char* s, size_t length = FFMT_AUTO) noexcept {
       return ::ffmt::puts(backend.data, s, length);
     }
 
@@ -138,7 +139,7 @@ namespace ffmt {
       return _check(::ffmt::putc(backend.data, c));
     }
 
-    size_t putc(std::nothrow_t, char c) {
+    size_t putc(std::nothrow_t, char c) noexcept {
       return ::ffmt::putc(backend.data, c);
     }
 
@@ -149,7 +150,7 @@ namespace ffmt {
     }
 
     template <typename... Args>
-    size_t write(std::nothrow_t, const char* format, Args&&... args) {
+    size_t write(std::nothrow_t, const char* format, Args&&... args) noexcept {
       return ::ffmt::write(backend.data, format, std::forward<Args>(args)...);
     }
 
