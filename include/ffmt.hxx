@@ -10,15 +10,16 @@ extern "C" {
 #include <utility>
 
 namespace ffmt {
-  inline auto puts(::ffmt_out_t& o, const char* s, size_t length = FFMT_AUTO) {
+  inline auto
+  puts(::ffmt_out_t& o, const char* s, size_t length = FFMT_AUTO) noexcept {
     return ::ffmt_puts(&o, s, length);
   }
 
-  inline auto putc(::ffmt_out_t& o, char c) {
+  inline auto putc(::ffmt_out_t& o, char c) noexcept {
     return ::ffmt_putc(&o, c);
   }
 
-  inline auto flush(::ffmt_out_t& o) {
+  inline auto flush(::ffmt_out_t& o) noexcept {
     return ::ffmt_flush(&o);
   }
 
@@ -47,9 +48,21 @@ namespace ffmt {
   } // namespace arg_packers
 
   template <typename... Args>
-  inline auto write(::ffmt_out_t& o, const char* format, Args... args) {
+  inline auto
+  write(::ffmt_out_t& o, const char* format, Args... args) noexcept {
     const ffmt_arg_t packed_args[] = {arg_packers::pack(args)...};
     return ::ffmt_write(&o, format, packed_args, sizeof...(Args));
+  }
+
+  template <typename... Args>
+  size_t write_to_string(
+      char* buffer,
+      size_t buffer_size,
+      const char* format,
+      Args&&... args) noexcept {
+    const ffmt_arg_t packed_args[] = {arg_packers::pack(args)...};
+    return ::ffmt_write_to_string(
+        buffer, buffer_size, format, packed_args, sizeof...(Args));
   }
 
   namespace details {
@@ -97,6 +110,12 @@ namespace ffmt {
       return msg;
     }
   };
+
+  void throw_if_failed(size_t result) {
+    if (::ffmt_is_err(result)) {
+      throw exception(result);
+    }
+  }
 
   struct out {
   public:
@@ -162,9 +181,7 @@ namespace ffmt {
     }
 
     static size_t _check(size_t result) {
-      if (ffmt_is_err(result)) {
-        throw exception(result);
-      }
+      throw_if_failed(result);
 
       return result;
     }

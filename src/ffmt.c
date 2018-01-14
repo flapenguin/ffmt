@@ -71,12 +71,14 @@ ffmt_puts_pad(ffmt_out_t* out, const char* str, size_t length, ffmt_pad_t pad) {
 
   if (right_pad) {
     const char* padstr = pad.align == '^' ? pad.auxstr : pad.str;
-    const size_t padstr_length = pad.align == '^' ? pad.auxstr_length : pad.str_length;
+    const size_t padstr_length =
+        pad.align == '^' ? pad.auxstr_length : pad.str_length;
 
     if (pad.sticky) {
       const size_t part_length = right_pad % padstr_length;
       if (part_length) {
-        FFMT__TRY(ffmt_puts(out, padstr + part_length, padstr_length - part_length));
+        FFMT__TRY(
+            ffmt_puts(out, padstr + part_length, padstr_length - part_length));
         right_pad -= part_length;
       }
     }
@@ -109,6 +111,7 @@ size_t ffmt_write(
     }
 
     if (!*curr) {
+      FFMT__TRY_ADVANCE(total, ffmt_putc(out, '\0'));
       break;
     }
 

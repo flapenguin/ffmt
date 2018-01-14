@@ -113,6 +113,13 @@ extern size_t ffmt_write(
     const ffmt_arg_t* args,
     size_t args_length);
 
+extern size_t ffmt_write_to_string(
+    char* destination,
+    size_t destination_size,
+    const char* format,
+    const ffmt_arg_t* args,
+    size_t args_length);
+
 extern FFMT_FORMATTER_DECL(ffmt_formatter_str);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_char);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_i64);

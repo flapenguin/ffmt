@@ -10,7 +10,7 @@ template <typename T, size_t Size>
 static inline size_t array_size(T (&x)[Size]) { return Size; }
 
 template <size_t Size>
-static inline size_t str_size(const char (&x)[Size]) { return Size - 1; }
+static inline size_t str_size(const char (&x)[Size]) { return Size; }
 
 template <size_t BufferSize>
 struct ss_output final : public ffmt::out {
@@ -215,10 +215,40 @@ static void test_throw() {
   }
 }
 
+static void test_write_to_string() {
+  {
+    char buffer[1024];
+    const size_t r = ffmt::write_to_string(buffer,
+      sizeof(buffer),
+      "{3},{2},{1},{0}",
+      -42,
+      1024,
+      14u,
+      "foobar");
+
+    ffmt::throw_if_failed(r);
+
+    const char expect[] = "foobar,14,1024,-42";
+    asserteq(expect, buffer);
+    asserteq(array_size(expect), r);
+  }
+
+  {
+    char buffer[8];
+    const size_t r = ffmt::write_to_string(buffer, sizeof(buffer), "{0:>7}", "xyz");
+    ffmt::throw_if_failed(r);
+
+    const char expect[] = "    xyz";
+    asserteq(expect, buffer);
+    asserteq(array_size(expect), r);
+  }
+}
+
 int main() {
   test_smoke();
   test_flush();
   test_format();
+  test_write_to_string();
   test_throw();
   test_pad();
 

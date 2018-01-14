@@ -13,6 +13,7 @@ add_library(ffmt STATIC
     src/u64_to_dec.c
     src/u64_to_hex.c
     src/ffmt.c
+    src/ffmt_write_to_string.c
     src/formatters.c)
 
 set_target_properties(ffmt PROPERTIES
