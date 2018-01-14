@@ -40,7 +40,7 @@ public:
 
 static void asserteq(const char* expected, const char* actual) {
   if (strcmp(expected, actual)) {
-    fprintf(stderr, "expected '%s', but got '%s'\n", expected, actual);
+    fprintf(stderr, "expected '\e[32m%s\e[0m', but got '\e[31m%s\e[0m'\n", expected, actual);
     failed = true;
   }
 }
@@ -164,6 +164,7 @@ static void test_pad() {
     ".\n 1234567  , foobar!  "
     ".\n.1234567..,.foobar!.."
     ".\n......custom,custom...... (width = 12)"
+    ".\n-<-foobar->-,-<foobar!->-"
     ".\n";
 
   const char format[] =
@@ -183,6 +184,7 @@ static void test_pad() {
     ".\n{2:^10},{3:^10}"
     ".\n{2:^(.)10},{3:^(.)10}"
     ".\n{4:>(.)@5},{4:<(.)@5} (width = {5})"
+    ".\n{1:^*(-<)(>-)12},{3:^*(-<)(>-)12}"
     ".\n";
 
   asserteq(str_size(result),

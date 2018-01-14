@@ -83,6 +83,11 @@ static inline const char* ffmt__parse_pad_spec(
 
   result.align = *start++;
 
+  if (start != end && *start == '*') {
+    result.sticky = true;
+    start++;
+  }
+
   if (start != end && *start == '(') {
     start++;
     result.str = start;
@@ -96,6 +101,26 @@ static inline const char* ffmt__parse_pad_spec(
 
     result.str_length = start - result.str;
     start++;
+  }
+
+  if (result.align == '^') {
+    if (start != end && *start == '(') {
+      start++;
+      result.auxstr = start;
+      while (*start != ')' && start != end) {
+        start++;
+      }
+
+      if (start == end) {
+        return start;
+      }
+
+      result.auxstr_length = start - result.auxstr;
+      start++;
+    } else {
+      result.auxstr = result.str;
+      result.auxstr_length = result.str_length;
+    }
   }
 
   bool ref = false;
