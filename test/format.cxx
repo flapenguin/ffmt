@@ -192,7 +192,7 @@ static void test_pad() {
         format,
         123456,
         "foobar",
-        1234567,
+        1234567u,
         "foobar!",
         "custom",
         12));
