@@ -135,7 +135,11 @@ namespace ffmt {
     }
     ~out() = default;
 
-    out(out&&) = delete;
+    out(out&& o) {
+      backend.data = o.backend.data;
+      backend.owner = this;
+    }
+
     out(out&) = delete;
     out& operator=(out&) = delete;
 

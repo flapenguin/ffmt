@@ -19,5 +19,11 @@ size_t ffmt_write_to_string(
   };
   /* clang-format on */
 
-  return ffmt_write(&out, format, args, args_length);
+  size_t length = ffmt_write(&out, format, args, args_length);
+  if (length + 1 > destination_size) {
+    return FFMT_ESMALLBUF;
+  }
+
+  destination[length] = '\0';
+  return length + 1;
 }

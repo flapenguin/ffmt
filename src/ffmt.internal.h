@@ -161,13 +161,20 @@ static inline size_t ffmt__fix_length(const char* str, size_t length) {
 
 static inline size_t
 ffmt__puts_base(ffmt_out_t* out, const char* str, size_t length) {
+  const int flush_char = out->flags & FFMT_FLUSH_CHAR ? out->flush_char : -1;
+
   for (size_t left = length; left;) {
     size_t till_flush = out->buffer_size - out->pos;
     while (till_flush && left) {
-      out->buffer[out->pos++] = *str++;
+      const char c = *str++;
+      out->buffer[out->pos++] = c;
 
       left--;
-      till_flush--;
+      if (c == flush_char) {
+        till_flush = 0;
+      } else {
+        till_flush--;
+      }
     }
 
     if (!till_flush) {

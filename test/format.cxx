@@ -9,9 +9,6 @@ static bool failed = false;
 template <typename T, size_t Size>
 static inline size_t array_size(T (&x)[Size]) { return Size; }
 
-template <size_t Size>
-static inline size_t str_size(const char (&x)[Size]) { return Size; }
-
 template <size_t BufferSize>
 struct ss_output final : public ffmt::out {
 private:
@@ -21,6 +18,14 @@ public:
   ss_output() {
     this->backend.data.buffer = (uint8_t*)&this->_buffer;
     this->backend.data.buffer_size = array_size(this->_buffer);
+    this->backend.data.flags = 0;
+  }
+
+  ss_output(ss_output&&) = default;
+
+  ss_output(char flush_char) : ss_output() {
+    this->backend.data.flags = FFMT_FLUSH_CHAR;
+    this->backend.data.flush_char = flush_char;
   }
 
   void flush() override {
@@ -33,21 +38,24 @@ public:
     _ss.clear();
   }
 
-  std::stringstream& get_stringstream() {
-    return _ss;
+  std::string to_string() {
+    return _ss.str();
   }
 };
 
-static void asserteq(const char* expected, const char* actual) {
-  if (strcmp(expected, actual)) {
-    fprintf(stderr, "expected '\e[32m%s\e[0m', but got '\e[31m%s\e[0m'\n", expected, actual);
+static void asserteq(std::string expected, std::string actual) {
+  if (expected != actual) {
+    fprintf(stderr, "expected %ld:'\e[32m%.*s\e[0m', but got %ld:'\e[31m%.*s\e[0m'\n",
+      expected.length(), (int)expected.length(), expected.c_str(),
+      actual.length(), (int)actual.length(), actual.c_str());
+
     failed = true;
   }
 }
 
 template <template<size_t BufferSize> class ss_output, size_t BufferSize>
 static void asserteq(const char* expected, ss_output<BufferSize>& out) {
-  asserteq(expected, out.get_stringstream().str().c_str());
+  asserteq(expected, out.to_string());
 }
 
 static void asserteq(size_t expected, size_t actual) {
@@ -97,7 +105,7 @@ static void test_format() {
   {
     const char result[] = "<foo><bar>";
 
-    asserteq(str_size(result), out.write("{1}{3}{2}{1}{0}{2}", "bar", "<", ">", "foo"));
+    out.write("{1}{3}{2}{1}{0}{2}", "bar", "<", ">", "foo");
 
     out.flush();
     asserteq(result, out);
@@ -112,22 +120,21 @@ static void test_format() {
       "\n00000000000000aa,0x00000000000000AA"
       "\n";
 
-    asserteq(str_size(result),
-        out.write(
-          "\n{0},{1},{2}"
-          "\n{0:x},{0:#x},{0:X},{0:#X}"
-          "\n{3},{4},{5},{6},{7}"
-          "\n{8},{8:#X}"
-          "\n",
-          0xaabbccddeeff0011,
-          123456789123456789UL,
-          -123456789123456789L,
-          "foobar",
-          true,
-          false,
-          'x',
-          'y',
-          (void*)0xaa));
+      out.write(
+        "\n{0},{1},{2}"
+        "\n{0:x},{0:#x},{0:X},{0:#X}"
+        "\n{3},{4},{5},{6},{7}"
+        "\n{8},{8:#X}"
+        "\n",
+        0xaabbccddeeff0011,
+        123456789123456789UL,
+        -123456789123456789L,
+        "foobar",
+        true,
+        false,
+        'x',
+        'y',
+        (void*)0xaa);
 
     out.flush();
     asserteq(result, out);
@@ -187,15 +194,14 @@ static void test_pad() {
     ".\n{1:^*(-<)(>-)12},{3:^*(-<)(>-)12}"
     ".\n";
 
-  asserteq(str_size(result),
-      out.write(
-        format,
-        123456,
-        "foobar",
-        1234567u,
-        "foobar!",
-        "custom",
-        12));
+  out.write(
+    format,
+    123456,
+    "foobar",
+    1234567u,
+    "foobar!",
+    "custom",
+    12);
 
   out.flush();
   asserteq(result, out);
@@ -230,7 +236,6 @@ static void test_write_to_string() {
 
     const char expect[] = "foobar,14,1024,-42";
     asserteq(expect, buffer);
-    asserteq(array_size(expect), r);
   }
 
   {
@@ -240,17 +245,58 @@ static void test_write_to_string() {
 
     const char expect[] = "    xyz";
     asserteq(expect, buffer);
-    asserteq(array_size(expect), r);
   }
 }
 
-int main() {
+static void test_flush_char() {
+  auto test_nl = [](ss_output<256> out, bool flush_on_lf) {
+    out.write("foo\n");
+    asserteq(flush_on_lf ? "foo\n" : "", out);
+
+    out.write("baz\n");
+    asserteq(flush_on_lf ? "foo\nbaz\n" : "", out);
+
+    out.write("qux");
+    asserteq(flush_on_lf ? "foo\nbaz\n" : "", out);
+
+    out.flush();
+    asserteq("foo\nbaz\nqux", out);
+  };
+
+  auto test_slash = [](ss_output<256> out, bool flush_on_slash) {
+    out.write("/usr");
+    asserteq(flush_on_slash ? "/" : "", out);
+
+    out.write("/include/asm");
+    asserteq(flush_on_slash ? "/usr/include/" : "", out);
+
+    out.write("-generic");
+    asserteq(flush_on_slash ? "/usr/include/" : "", out);
+
+    out.flush();
+    asserteq("/usr/include/asm-generic", out);
+  };
+
+  test_nl(ss_output<256> {'\n'}, true);
+  test_nl(ss_output<256> {}, false);
+  test_slash(ss_output<256> {'/'}, true);
+  test_slash(ss_output<256> {}, false);
+}
+
+int main() try {
   test_smoke();
   test_flush();
   test_format();
   test_write_to_string();
   test_throw();
   test_pad();
+  test_flush_char();
 
   return failed ? 1 : 0;
+} catch (std::exception& e) {
+  printf("exception: %s\n", e.what());
+  return 1;
+} catch (...) {
+  printf("unknown exception: something really bad happened\n");
+  return 1;
 }

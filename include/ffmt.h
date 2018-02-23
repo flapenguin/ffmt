@@ -28,6 +28,8 @@
 
 #define FFMT_AUTO ((size_t)-1)
 
+#define FFMT_FLUSH_CHAR 0x1
+
 #define FFMT_EFLUSH ((size_t)-1)
 #define FFMT_EFORMAT ((size_t)-2)
 #define FFMT_EARGLEN ((size_t)-3)
@@ -67,8 +69,10 @@ struct ffmt_out_t {
   uint8_t* buffer;
   size_t buffer_size;
   size_t pos;
+  uint64_t flags;
 
   void (*flush)(ffmt_out_t* self);
+  char flush_char;
 };
 
 struct ffmt_arg_t {

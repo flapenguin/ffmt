@@ -7,13 +7,20 @@ void ffmt_flush(ffmt_out_t* out) {
 size_t ffmt_putc(ffmt_out_t* out, char c) {
   if (out->pos >= out->buffer_size) {
     ffmt_flush(out);
-  }
-
-  if (out->pos >= out->buffer_size) {
-    return FFMT_EFLUSH;
+    if (out->pos >= out->buffer_size) {
+      return FFMT_EFLUSH;
+    }
   }
 
   out->buffer[out->pos++] = c;
+
+  if (out->flags & FFMT_FLUSH_CHAR && out->flush_char == c) {
+    ffmt_flush(out);
+    if (out->pos >= out->buffer_size) {
+      return FFMT_EFLUSH;
+    }
+  }
+
   return 1;
 }
 
@@ -107,11 +114,11 @@ size_t ffmt_write(
     }
 
     if (curr > plain_start) {
-      FFMT__TRY_ADVANCE(total, ffmt_puts(out, plain_start, curr - plain_start));
+      FFMT__TRY_ADVANCE(
+          total, ffmt__puts_base(out, plain_start, curr - plain_start));
     }
 
     if (!*curr) {
-      FFMT__TRY_ADVANCE(total, ffmt_putc(out, '\0'));
       break;
     }
 
