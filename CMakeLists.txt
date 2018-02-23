@@ -10,11 +10,14 @@ project(ffmt)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_library(ffmt STATIC
-    src/u64_to_dec.c
-    src/u64_to_hex.c
-    src/ffmt.c
+    src/ffmt_formatter.c
+    src/ffmt_puts_pad.c
+    src/ffmt_u64_to_dec.c
+    src/ffmt_u64_to_hex.c
     src/ffmt_write_to_string.c
-    src/formatters.c)
+    src/ffmt_write.c
+    src/ffmt.c
+)
 
 set_target_properties(ffmt PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "bin/")

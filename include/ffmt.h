@@ -82,17 +82,17 @@ struct ffmt_arg_t {
 };
 
 struct ffmt_pad_t {
-  char align;
   size_t width;
   const char* str;
   size_t str_length;
   const char* auxstr;
   size_t auxstr_length;
+  char align;
   bool sticky;
 };
 
 /* clang-format off */
-#define FFMT_PAD_DEFAULT (ffmt_pad_t){ '\0', 0, " ", 1, "", 0, false }
+#define FFMT_PAD_DEFAULT (ffmt_pad_t){ 0, " ", 1, "", 0, '\0', false }
 /* clang-format on */
 
 /* API */
