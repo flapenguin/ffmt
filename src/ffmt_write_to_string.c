@@ -8,8 +8,8 @@ size_t ffmt_write_to_string(
     char* destination,
     size_t destination_size,
     const char* format,
-    const ffmt_arg_t* args,
-    size_t args_length) {
+    size_t args_length,
+    const ffmt_arg_t* args) {
   /* clang-format off */
   ffmt_out_t out = {
     .buffer = (void*)destination,
@@ -19,7 +19,7 @@ size_t ffmt_write_to_string(
   };
   /* clang-format on */
 
-  size_t length = ffmt_write(&out, format, args, args_length);
+  size_t length = ffmt_write(&out, format, args_length, args);
   if (length + 1 > destination_size) {
     return FFMT_ESMALLBUF;
   }

@@ -146,7 +146,7 @@ static void test_format() {
 
   {
     const ffmt_arg_t args[] = { {0, (const void*)"nope" } };
-    asserteq(FFMT_ENOFORMATTER, ::ffmt_write(&out.get_ffmt_out(), "{0}", args, array_size(args)));
+    asserteq(FFMT_ENOFORMATTER, ::ffmt_write(&out.get_ffmt_out(), "{0}", array_size(args), args));
     out.clear();
   }
 }

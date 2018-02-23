@@ -28,7 +28,7 @@ namespace ffmt {
     template <typename T>
     auto get_formatter(const T*) { return ::ffmt_formatter_ptr; }
 
-    auto get_formatter(const char*) { return ::ffmt_formatter_str; }
+    auto get_formatter(const char*) { return ::ffmt_formatter_strz; }
     auto get_formatter(char) { return ::ffmt_formatter_char; }
     auto get_formatter(bool) { return ::ffmt_formatter_bool; }
     auto get_formatter(int) { return ::ffmt_formatter_i64; }
@@ -51,7 +51,7 @@ namespace ffmt {
   inline auto
   write(::ffmt_out_t& o, const char* format, Args... args) noexcept {
     const ffmt_arg_t packed_args[] = {arg_packers::pack(args)...};
-    return ::ffmt_write(&o, format, packed_args, sizeof...(Args));
+    return ::ffmt_write(&o, format, sizeof...(Args), packed_args);
   }
 
   template <typename... Args>
@@ -62,7 +62,7 @@ namespace ffmt {
       Args&&... args) noexcept {
     const ffmt_arg_t packed_args[] = {arg_packers::pack(args)...};
     return ::ffmt_write_to_string(
-        buffer, buffer_size, format, packed_args, sizeof...(Args));
+        buffer, buffer_size, format, sizeof...(Args), packed_args);
   }
 
   namespace details {

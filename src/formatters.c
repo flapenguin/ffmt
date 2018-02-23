@@ -1,10 +1,10 @@
 #include "ffmt.internal.h"
 
-size_t ffmt_formatter_str(
+size_t ffmt_formatter_strz(
     ffmt_out_t* out,
     const ffmt_arg_t arg,
-    const ffmt_arg_t* args,
     size_t args_length,
+    const ffmt_arg_t* args,
     const char* spec,
     const char* spec_end) {
   (void)args;
@@ -17,7 +17,7 @@ size_t ffmt_formatter_str(
     switch (*spec) {
       case FFMT__PAD_CASES:
         spec =
-            ffmt__parse_pad_spec(spec, spec_end, &pad, args, args_length) - 1;
+            ffmt__parse_pad_spec(spec, spec_end, &pad, args_length, args) - 1;
         break;
     }
   }
@@ -28,8 +28,8 @@ size_t ffmt_formatter_str(
 size_t ffmt_formatter_bool(
     ffmt_out_t* out,
     const ffmt_arg_t arg,
-    const ffmt_arg_t* args,
     size_t args_length,
+    const ffmt_arg_t* args,
     const char* spec,
     const char* spec_end) {
   (void)args;
@@ -43,8 +43,8 @@ size_t ffmt_formatter_bool(
 size_t ffmt_formatter_char(
     ffmt_out_t* out,
     const ffmt_arg_t arg,
-    const ffmt_arg_t* args,
     size_t args_length,
+    const ffmt_arg_t* args,
     const char* spec,
     const char* spec_end) {
   (void)args;
@@ -58,28 +58,28 @@ size_t ffmt_formatter_char(
 size_t ffmt_formatter_ptr(
     ffmt_out_t* out,
     const ffmt_arg_t arg,
-    const ffmt_arg_t* args,
     size_t args_length,
+    const ffmt_arg_t* args,
     const char* spec,
     const char* spec_end) {
-  return ffmt_formatter_u64(out, arg, args, args_length, spec, spec_end);
+  return ffmt_formatter_u64(out, arg, args_length, args, spec, spec_end);
 }
 
 size_t ffmt_formatter_i64(
     ffmt_out_t* out,
     const ffmt_arg_t arg,
-    const ffmt_arg_t* args,
     size_t args_length,
+    const ffmt_arg_t* args,
     const char* spec,
     const char* spec_end) {
-  return ffmt_formatter_u64(out, arg, args, args_length, spec, spec_end);
+  return ffmt_formatter_u64(out, arg, args_length, args, spec, spec_end);
 }
 
 size_t ffmt_formatter_u64(
     ffmt_out_t* out,
     const ffmt_arg_t arg,
-    const ffmt_arg_t* args,
     size_t args_length,
+    const ffmt_arg_t* args,
     const char* spec,
     const char* spec_end) {
   (void)args;
@@ -107,7 +107,7 @@ size_t ffmt_formatter_u64(
         break;
       case FFMT__PAD_CASES:
         spec =
-            ffmt__parse_pad_spec(spec, spec_end, &pad, args, args_length) - 1;
+            ffmt__parse_pad_spec(spec, spec_end, &pad, args_length, args) - 1;
         break;
     }
   }

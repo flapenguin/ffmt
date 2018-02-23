@@ -41,3 +41,4 @@ endfunction(create_test)
 
 create_test(dechex test/dechex.c)
 create_test(format test/format.cxx)
+create_test(c_api test/c_api.c)

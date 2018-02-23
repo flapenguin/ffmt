@@ -99,11 +99,13 @@ ffmt_puts_pad(ffmt_out_t* out, const char* str, size_t length, ffmt_pad_t pad) {
 size_t ffmt_write(
     ffmt_out_t* out,
     const char* format,
-    const ffmt_arg_t* args,
-    size_t args_length) {
+    size_t args_length,
+    const ffmt_arg_t* args) {
   size_t total = 0;
   bool position_args = false;
   size_t arg_ix = 0;
+
+  args_length = ffmt__fix_args_length(args, args_length);
 
   const char* curr = format;
   const char* plain_start;
@@ -163,7 +165,7 @@ size_t ffmt_write(
     }
 
     FFMT__TRY_ADVANCE(
-        total, formatter(out, arg, args, args_length, spec_start, spec_end));
+        total, formatter(out, arg, args_length, args, spec_start, spec_end));
 
     if (!position_args) {
       arg_ix++;

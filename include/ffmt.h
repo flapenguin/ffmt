@@ -27,6 +27,7 @@
 /* clang-format on */
 
 #define FFMT_AUTO ((size_t)-1)
+#define FFMT_FORMATTER_LAST ((ffmt_formatter_t)-1)
 
 #define FFMT_FLUSH_CHAR 0x1
 
@@ -52,8 +53,8 @@
   size_t Name( \
     ffmt_out_t* out, \
     const ffmt_arg_t arg, \
-    const ffmt_arg_t* args, \
     size_t args_length, \
+    const ffmt_arg_t* args, \
     const char* spec, \
     const char* spec_end)
 /* clang-format on */
@@ -114,17 +115,17 @@ ffmt_u64_to_hex(uint64_t value, char* buffer, size_t buffer_size, bool upper);
 extern size_t ffmt_write(
     ffmt_out_t* out,
     const char* format,
-    const ffmt_arg_t* args,
-    size_t args_length);
+    size_t args_length,
+    const ffmt_arg_t* args);
 
 extern size_t ffmt_write_to_string(
     char* destination,
     size_t destination_size,
     const char* format,
-    const ffmt_arg_t* args,
-    size_t args_length);
+    size_t args_length,
+    const ffmt_arg_t* args);
 
-extern FFMT_FORMATTER_DECL(ffmt_formatter_str);
+extern FFMT_FORMATTER_DECL(ffmt_formatter_strz);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_char);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_i64);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_u64);

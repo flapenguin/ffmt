@@ -77,8 +77,8 @@ static inline const char* ffmt__parse_pad_spec(
     const char* start,
     const char* end,
     ffmt_pad_t* value,
-    const ffmt_arg_t* args,
-    size_t args_length) {
+    size_t args_length,
+    const ffmt_arg_t* args) {
   ffmt_pad_t result = *value;
 
   result.align = *start++;
@@ -144,6 +144,20 @@ static inline const char* ffmt__parse_pad_spec(
   *value = result;
 
   return start;
+}
+
+static inline size_t
+ffmt__fix_args_length(const ffmt_arg_t* args, size_t length) {
+  if (length != FFMT_AUTO) {
+    return length;
+  }
+
+  length = 0;
+  while (args[length].formatter != FFMT_FORMATTER_LAST) {
+    length++;
+  }
+
+  return length;
 }
 
 static inline size_t ffmt__fix_length(const char* str, size_t length) {
