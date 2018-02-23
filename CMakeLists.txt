@@ -22,7 +22,7 @@ add_library(ffmt STATIC
 set_target_properties(ffmt PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "bin/")
 
-set_target_properties(ffmt PROPERTIES C_STANDARD 11)
+set_target_properties(ffmt PROPERTIES C_STANDARD 99)
 target_compile_options(ffmt PRIVATE
     -Wall -Wextra -nostdlib -Wmissing-prototypes -Wmissing-declarations -Werror)
 
