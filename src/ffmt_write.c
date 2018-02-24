@@ -2,6 +2,7 @@
 
 size_t ffmt_write(
     ffmt_out_t* out,
+    size_t format_length,
     const char* format,
     size_t args_length,
     const ffmt_arg_t* args) {
@@ -9,13 +10,12 @@ size_t ffmt_write(
   bool position_args = false;
   size_t arg_ix = 0;
 
-  args_length = ffmt__fix_args_length(args, args_length);
-
   const char* curr = format;
+  const char* end = format + format_length;
   const char* plain_start;
   while (true) {
     plain_start = curr;
-    while (*curr && *curr != '{') {
+    while (curr < end && *curr != '{') {
       curr++;
     }
 
@@ -24,7 +24,7 @@ size_t ffmt_write(
           total, ffmt__puts_base(out, plain_start, curr - plain_start));
     }
 
-    if (!*curr) {
+    if (curr >= end) {
       break;
     }
 

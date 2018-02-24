@@ -145,8 +145,8 @@ static void test_format() {
   asserteq(FFMT_EARGLEN, out.write(std::nothrow, "{1}"));
 
   {
-    const ffmt_arg_t args[] = { {0, (const void*)"nope" } };
-    asserteq(FFMT_ENOFORMATTER, ::ffmt_write(&out.get_ffmt_out(), "{0}", array_size(args), args));
+    const ffmt_arg_t args[] = { {0, (const void*)"nope" }, {FFMT_EZ_FORMATTER_LAST} };
+    asserteq(FFMT_ENOFORMATTER, ::ffmt_ez_write(&out.get_ffmt_out(), "{0}", args));
     out.clear();
   }
 }

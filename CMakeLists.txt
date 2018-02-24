@@ -16,6 +16,7 @@ add_library(ffmt STATIC
     src/ffmt_u64_to_hex.c
     src/ffmt_write_to_string.c
     src/ffmt_write.c
+    src/ffmt_ez.c
     src/ffmt.c
 )
 

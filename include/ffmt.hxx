@@ -10,8 +10,11 @@ extern "C" {
 #include <utility>
 
 namespace ffmt {
-  inline auto
-  puts(::ffmt_out_t& o, const char* s, size_t length = FFMT_AUTO) noexcept {
+  inline auto puts(::ffmt_out_t& o, const char* s) noexcept {
+    return ::ffmt_ez_puts(&o, s);
+  }
+
+  inline auto puts(::ffmt_out_t& o, const char* s, size_t length) noexcept {
     return ::ffmt_puts(&o, s, length);
   }
 
@@ -47,25 +50,15 @@ namespace ffmt {
     }
   } // namespace arg_packers
 
-  template <typename... Args>
-  inline auto
-  write(::ffmt_out_t& o, const char* format, Args... args) noexcept {
-    const ffmt_arg_t packed_args[] = {arg_packers::pack(args)...};
-    return ::ffmt_write(&o, format, sizeof...(Args), packed_args);
-  }
-
-  template <typename... Args>
-  size_t write_to_string(
-      char* buffer,
-      size_t buffer_size,
-      const char* format,
-      Args&&... args) noexcept {
-    const ffmt_arg_t packed_args[] = {arg_packers::pack(args)...};
-    return ::ffmt_write_to_string(
-        buffer, buffer_size, format, sizeof...(Args), packed_args);
-  }
-
   namespace details {
+    size_t strlen(const char* s) {
+      size_t l = 0;
+      while (*s++) {
+        l++;
+      }
+      return l;
+    }
+
     template <class Container, class Member>
     size_t offset_of_(const Member Container::*member) {
       return (size_t) & (reinterpret_cast<Container*>(0)->*member);
@@ -93,6 +86,30 @@ namespace ffmt {
           return "Unknown error. (probably a bug in c++ wrapper)";
       }
     }
+  }
+
+  template <typename... Args>
+  inline auto
+  write(::ffmt_out_t& o, const char* format, Args... args) noexcept {
+    const ffmt_arg_t packed_args[] = {arg_packers::pack(args)...};
+    return ::ffmt_write(
+        &o, details::strlen(format), format, sizeof...(Args), packed_args);
+  }
+
+  template <typename... Args>
+  size_t write_to_string(
+      char* buffer,
+      size_t buffer_size,
+      const char* format,
+      Args&&... args) noexcept {
+    const ffmt_arg_t packed_args[] = {arg_packers::pack(args)...};
+    return ::ffmt_write_to_string(
+        buffer,
+        buffer_size,
+        details::strlen(format),
+        format,
+        sizeof...(Args),
+        packed_args);
   }
 
   struct exception final : public std::exception {
@@ -149,13 +166,20 @@ namespace ffmt {
       return backend.data;
     }
 
-    size_t puts(const char* s, size_t length = FFMT_AUTO) {
+    size_t puts(const char* s, size_t length) {
       return _check(::ffmt::puts(backend.data, s, length));
     }
 
-    size_t
-    puts(std::nothrow_t, const char* s, size_t length = FFMT_AUTO) noexcept {
+    size_t puts(const char* s) {
+      return _check(::ffmt::puts(backend.data, s));
+    }
+
+    size_t puts(std::nothrow_t, const char* s, size_t length) noexcept {
       return ::ffmt::puts(backend.data, s, length);
+    }
+
+    size_t puts(std::nothrow_t, const char* s) noexcept {
+      return ::ffmt::puts(backend.data, s);
     }
 
     size_t putc(char c) {

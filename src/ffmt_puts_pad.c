@@ -6,8 +6,6 @@ ffmt_puts_pad(ffmt_out_t* out, const char* str, size_t length, ffmt_pad_t pad) {
     return ffmt_puts(out, str, length);
   }
 
-  length = ffmt__fix_length(str, length);
-
   size_t left_pad = 0;
   size_t right_pad = 0;
 

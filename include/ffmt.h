@@ -26,8 +26,7 @@
   )
 /* clang-format on */
 
-#define FFMT_AUTO ((size_t)-1)
-#define FFMT_FORMATTER_LAST ((ffmt_formatter_t)-1)
+#define FFMT_EZ_FORMATTER_LAST ((ffmt_formatter_t)-1)
 
 #define FFMT_FLUSH_CHAR 0x1
 
@@ -104,9 +103,14 @@ static inline bool ffmt_is_err(size_t value) {
 extern void ffmt_flush(ffmt_out_t* out);
 
 extern size_t ffmt_putc(ffmt_out_t* out, char c);
+
 extern size_t ffmt_puts(ffmt_out_t* out, const char* str, size_t length);
+extern size_t ffmt_ez_puts(ffmt_out_t* out, const char* str);
+
 extern size_t
 ffmt_puts_pad(ffmt_out_t* out, const char* str, size_t length, ffmt_pad_t pad);
+extern size_t
+ffmt_ez_puts_pad(ffmt_out_t* out, const char* str, ffmt_pad_t pad);
 
 extern int ffmt_u64_to_dec(uint64_t value, char* buffer, size_t buffer_size);
 extern int
@@ -114,15 +118,26 @@ ffmt_u64_to_hex(uint64_t value, char* buffer, size_t buffer_size, bool upper);
 
 extern size_t ffmt_write(
     ffmt_out_t* out,
+    size_t format_length,
     const char* format,
     size_t args_length,
     const ffmt_arg_t* args);
 
+extern size_t
+ffmt_ez_write(ffmt_out_t* out, const char* format, const ffmt_arg_t* args);
+
 extern size_t ffmt_write_to_string(
     char* destination,
     size_t destination_size,
+    size_t format_length,
     const char* format,
     size_t args_length,
+    const ffmt_arg_t* args);
+
+extern size_t ffmt_ez_write_to_string(
+    char* destination,
+    size_t destination_size,
+    const char* format,
     const ffmt_arg_t* args);
 
 extern FFMT_FORMATTER_DECL(ffmt_formatter_strz);

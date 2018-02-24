@@ -25,7 +25,5 @@ size_t ffmt_putc(ffmt_out_t* out, char c) {
 }
 
 size_t ffmt_puts(ffmt_out_t* out, const char* str, size_t length) {
-  length = ffmt__fix_length(str, length);
-
   return ffmt__puts_base(out, str, length);
 }
