@@ -3,10 +3,11 @@
 root="$(pwd)"
 . "$(dirname $0)/config.sh"
 
+bdir="./.test-build"
 err=0
 
 run() {
-  local dir="./.test-build/$1"
+  local dir="$bdir/$1"
   rm -rf "$dir"
   mkdir -p "$dir"
 
@@ -23,5 +24,10 @@ run() {
 run debug
 run release
 
-[ $err -ne 0 ] && printf "\n\n"
+[ $err -ne 0 ] && {
+  printf "\n\n"
+} || {
+  rm -rf $bdir
+}
+
 exit $err
