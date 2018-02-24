@@ -146,24 +146,6 @@ static inline const char* ffmt__parse_pad_spec(
   return start;
 }
 
-static inline size_t ffmt__calculate_args_length(const ffmt_arg_t* args) {
-  size_t length = 0;
-  while (args[length].formatter != FFMT_EZ_FORMATTER_LAST) {
-    length++;
-  }
-
-  return length;
-}
-
-static inline size_t ffmt__calculate_string_length(const char* str) {
-  const char* x = str;
-  while (*x) {
-    x++;
-  }
-
-  return x - str;
-}
-
 static inline size_t
 ffmt__puts_base(ffmt_out_t* out, const char* str, size_t length) {
   const int flush_char = out->flags & FFMT_FLUSH_CHAR ? out->flush_char : -1;

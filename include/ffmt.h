@@ -26,7 +26,8 @@
   )
 /* clang-format on */
 
-#define FFMT_EZ_FORMATTER_LAST ((ffmt_formatter_t)-1)
+#define FFMT__EZ_FORMATTER_LAST ((ffmt_formatter_t)-1)
+#define FFMT_EZ_ARG_LAST ((ffmt_arg_t){ FFMT__EZ_FORMATTER_LAST })
 
 #define FFMT_FLUSH_CHAR 0x1
 
@@ -94,23 +95,15 @@ struct ffmt_pad_t {
 #define FFMT_PAD_DEFAULT (ffmt_pad_t){ 0, " ", 1, "", 0, '\0', false }
 /* clang-format on */
 
-/* API */
-static inline bool ffmt_is_err(size_t value) {
-  return value >= (size_t)-4096;
-}
-
 /* API + ABI */
 extern void ffmt_flush(ffmt_out_t* out);
 
 extern size_t ffmt_putc(ffmt_out_t* out, char c);
 
 extern size_t ffmt_puts(ffmt_out_t* out, const char* str, size_t length);
-extern size_t ffmt_ez_puts(ffmt_out_t* out, const char* str);
 
 extern size_t
 ffmt_puts_pad(ffmt_out_t* out, const char* str, size_t length, ffmt_pad_t pad);
-extern size_t
-ffmt_ez_puts_pad(ffmt_out_t* out, const char* str, ffmt_pad_t pad);
 
 extern int ffmt_u64_to_dec(uint64_t value, char* buffer, size_t buffer_size);
 extern int
@@ -123,9 +116,6 @@ extern size_t ffmt_write(
     size_t args_length,
     const ffmt_arg_t* args);
 
-extern size_t
-ffmt_ez_write(ffmt_out_t* out, const char* format, const ffmt_arg_t* args);
-
 extern size_t ffmt_write_to_string(
     char* destination,
     size_t destination_size,
@@ -134,17 +124,74 @@ extern size_t ffmt_write_to_string(
     size_t args_length,
     const ffmt_arg_t* args);
 
-extern size_t ffmt_ez_write_to_string(
-    char* destination,
-    size_t destination_size,
-    const char* format,
-    const ffmt_arg_t* args);
-
 extern FFMT_FORMATTER_DECL(ffmt_formatter_strz);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_char);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_i64);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_u64);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_bool);
 extern FFMT_FORMATTER_DECL(ffmt_formatter_ptr);
+
+/* Utils */
+static inline size_t ffmt__strlen(const char* str) {
+  const char* x = str;
+  while (*x) {
+    x++;
+  }
+
+  return x - str;
+}
+
+#ifdef __cplusplus
+size_t strlen(const char* str) throw() __attribute__((pure, weak, alias("ffmt__strlen")));
+#else
+size_t strlen(const char* str) __attribute__((pure, weak, alias("ffmt__strlen")));
+#endif
+
+static inline size_t ffmt__argslen(const ffmt_arg_t* args) {
+  size_t length = 0;
+  while (args[length].formatter != FFMT__EZ_FORMATTER_LAST) {
+    length++;
+  }
+
+  return length;
+}
+
+/* API */
+static inline bool ffmt_is_err(size_t value) {
+  return value >= (size_t)-4096;
+}
+
+static inline size_t ffmt_ez_write_to_string(
+    char* destination,
+    size_t destination_size,
+    const char* format,
+    const ffmt_arg_t* args) {
+  return ffmt_write_to_string(
+      destination,
+      destination_size,
+      strlen(format),
+      format,
+      ffmt__argslen(args),
+      args);
+}
+
+static inline size_t
+ffmt_ez_write(ffmt_out_t* out, const char* format, const ffmt_arg_t* args) {
+  return ffmt_write(
+      out,
+      strlen(format),
+      format,
+      ffmt__argslen(args),
+      args);
+}
+
+static inline size_t ffmt_ez_puts(ffmt_out_t* out, const char* str) {
+  return ffmt_puts(out, str, strlen(str));
+}
+
+static inline size_t
+ffmt_ez_puts_pad(ffmt_out_t* out, const char* str, ffmt_pad_t pad) {
+  return ffmt_puts_pad(out, str, strlen(str), pad);
+}
 
 #endif /* FFMT_H__ */

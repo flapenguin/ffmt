@@ -23,7 +23,7 @@ size_t ffmt_formatter_strz(
   }
 
   const char* str = (const char*)arg.value;
-  return ffmt_puts_pad(out, str, ffmt__calculate_string_length(str), pad);
+  return ffmt_puts_pad(out, str, strlen(str), pad);
 }
 
 size_t ffmt_formatter_bool(
