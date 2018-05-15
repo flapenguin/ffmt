@@ -1,0 +1,14 @@
+# Example of `confiig.local.sh` file.
+# Override external tools.
+
+clang_format() {
+  clang-format-6.0 "$@"
+}
+
+cmake() {
+  /path/to/cmake "$@"
+}
+
+ctest() {
+  /path/to/ctest "$@"
+}
