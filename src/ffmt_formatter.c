@@ -130,9 +130,9 @@ size_t ffmt_formatter_u64(
     val = (uint64_t)arg.value;
   }
 
-  if (is_hex && has_prefix) {
+  if (has_prefix) {
     *current++ = '0';
-    *current++ = 'x';
+    *current++ = is_hex ? 'x' : 'd';
   }
 
   /* clang-format off */
