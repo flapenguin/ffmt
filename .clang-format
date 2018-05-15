@@ -1,0 +1,24 @@
+Language: Cpp
+
+TabWidth: 2
+ColumnLimit: 80
+
+AlignAfterOpenBracket: AlwaysBreak
+PointerAlignment: Left
+AlignOperands: false
+
+BreakBeforeBraces: Attach
+BreakBeforeTernaryOperators: true
+AlwaysBreakTemplateDeclarations: true
+
+AllowAllParametersOfDeclarationOnNextLine: false
+BinPackParameters: false
+BinPackArguments: false
+
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+
+NamespaceIndentation: All
+IndentCaseLabels: true

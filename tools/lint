@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+err=0
+tmp="`mktemp`"
+
+. "$(dirname $0)/config.sh"
+
+for file in src/*.{c,h} include/*.h; do
+  clang_format -style=file "$file" >"$tmp"
+  chmod --reference="$file" "$tmp"
+
+  git --no-pager diff --quiet -- "$file" "$tmp"
+  if [ $? -eq 0 ]; then
+    continue
+  fi
+
+  echo ""
+  echo "====================================="
+  echo "==== $file ..."
+  echo "====================================="
+  git --no-pager diff -- "$file" "$tmp"
+  if [ $? -ne 0 ]; then
+    err=1
+  fi
+done
+
+rm "$tmp"
+if [ $err -eq 0 ]; then
+  printf "\033[32m=== linter ok===\033[0m\n"
+else
+  printf "\n\033[31m=== linter failed===\033[0m\n" >&2
+fi
+exit $err
