@@ -20,6 +20,7 @@ done
 
 exit 0
 EOF
+  chmod +x "$hooksdir/$hook"
 
 done
 
